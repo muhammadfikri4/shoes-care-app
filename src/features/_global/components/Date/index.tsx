@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DayPicker, DayPickerProps } from "react-day-picker";
+import { DayPicker, DayPickerProps, PropsSingle } from "react-day-picker";
 import { BsCalendarDateFill } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { formatTime } from "../../lib/format-time";
 
 export interface DatePickerProps {
   dropdownState?: (state: boolean) => void;
-  selected?: Date;
+  selected: PropsSingle["selected"];
 }
 
-export const DatePicker: React.FC<DatePickerProps & DayPickerProps> = ({
-  dropdownState,
-  ...rest
-}) => {
+export type DateProps = DatePickerProps & DayPickerProps;
+
+export const DatePicker: React.FC<DateProps> = ({ dropdownState, ...rest }) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [show, setShow] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);

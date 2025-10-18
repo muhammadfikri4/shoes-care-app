@@ -27,6 +27,7 @@ export const API_ENDPOINT = {
     transactions: `${CONFIG_APP.BASE_URL}/transactions`,
     transactionsMy: `${CONFIG_APP.BASE_URL}/transactions/my`,
     transactionsScan: `${CONFIG_APP.BASE_URL}/transactions/scan`,
+    transactionsLookup: `${CONFIG_APP.BASE_URL}/transactions/lookup`,
   },
   authOtp: {
     request: `${CONFIG_APP.BASE_URL}/auth/customer-otp/request`,

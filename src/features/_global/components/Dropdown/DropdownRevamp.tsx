@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { MdKeyboardArrowDown, MdOutlineSearch } from "react-icons/md";
 import { Input } from "../Input";
 
@@ -7,8 +15,7 @@ export interface ListItem {
   value: string;
   disabled?: boolean;
 }
-
-interface IDropdownProps {
+export interface IDropdownProps {
   list: ListItem[];
   placeholder?: string;
   defaultValue?: ListItem;
@@ -21,10 +28,13 @@ interface IDropdownProps {
   withShadow?: boolean;
 }
 
-const initValue: ListItem = {
-  label: "",
-  value: "",
-  disabled: false,
+const initValue: ListItem = { label: "", value: "", disabled: false };
+
+type MenuPos = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
 };
 
 export const DropdownRevamp: React.FC<IDropdownProps> = ({
@@ -44,45 +54,176 @@ export const DropdownRevamp: React.FC<IDropdownProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [selected, setSelected] = useState(reset ? initValue : defaultValue);
 
-  const ref = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setData(list);
-  }, [list]);
+  const [pos, setPos] = useState<MenuPos | null>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setShow(false); // Tutup popup jika klik di luar
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  useEffect(() => setData(list), [list]);
   useEffect(() => {
     if (reset) setSelected(initValue);
   }, [reset]);
 
+  // Tutup jika klik di luar (root + menu portal)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        menuRef.current &&
+        !menuRef.current.contains(target)
+      ) {
+        setShow(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Hitung posisi menu setiap open/resize/scroll
+  useLayoutEffect(() => {
+    if (!show || !triggerRef.current) return;
+
+    const compute = () => {
+      const rect = triggerRef.current!.getBoundingClientRect();
+      const viewportH = window.innerHeight;
+      const viewportW = window.innerWidth;
+
+      const spaceBelow = viewportH - rect.bottom;
+      const spaceAbove = rect.top;
+
+      const menuDesiredHeight = 384; // ~max-h-96
+      const openUp = spaceBelow < 240 && spaceAbove > spaceBelow; // buka ke atas jika bawah sempit
+
+      const top = openUp
+        ? Math.max(8, rect.top - Math.min(menuDesiredHeight, spaceAbove) - 8)
+        : rect.bottom + 8;
+      const left = Math.min(rect.left, viewportW - rect.width - 8);
+      const maxHeight = openUp
+        ? Math.max(120, spaceAbove - 16)
+        : Math.max(120, spaceBelow - 16);
+
+      setPos({
+        top: Math.round(top),
+        left: Math.round(left),
+        width: Math.round(rect.width),
+        maxHeight: Math.round(maxHeight),
+      });
+    };
+
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(document.documentElement);
+
+    const onScroll = () => compute();
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", compute);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", compute);
+    };
+  }, [show]);
+
+  // Filter lokal saat search
+  const onLocalSearch = useCallback(
+    (q: string) => {
+      onSearch?.(q);
+      if (!q) {
+        setData(list);
+        return;
+      }
+      setData((prev) =>
+        (prev.length ? prev : list).filter((item) =>
+          item.label.toLowerCase().includes(q.toLowerCase())
+        )
+      );
+    },
+    [list, onSearch]
+  );
+
+  const menu = useMemo(() => {
+    if (!show || !pos) return null;
+    return createPortal(
+      <div
+        ref={menuRef}
+        style={{
+          position: "fixed",
+          top: pos.top,
+          left: pos.left,
+          width: pos.width,
+          maxHeight: pos.maxHeight,
+          zIndex: 2147483647, // paling atas
+          boxShadow: withShadow ? "0px 8px 12px 0px rgba(0,0,0,0.08)" : "none",
+        }}
+        className="overflow-auto flex flex-col gap-1 bg-white border border-solid border-gray-300 rounded-lg px-2 py-2"
+      >
+        {searchInput && (
+          <div className="sticky top-0 bg-white z-10 py-2">
+            <Input
+              value={inputValue}
+              inputSize="md"
+              placeholder="Search"
+              LeftIcon={<MdOutlineSearch className="text-xl text-gray-500" />}
+              onChange={(e) => onLocalSearch(e.target.value)}
+            />
+          </div>
+        )}
+
+        {(data?.length
+          ? data
+          : [{ label: "Not Found", value: "Not Found", disabled: true }]
+        ).map((item) => (
+          <div
+            key={item.value}
+            onClick={() => {
+              if (item.disabled) return;
+              setShow(false);
+              setSelected(item);
+              onChange?.(item);
+            }}
+            className={`w-full rounded-lg flex items-center px-4 py-3 ${
+              !item.disabled
+                ? "hover:bg-gray-100 cursor-pointer"
+                : "text-gray-500"
+            }`}
+          >
+            <p className="text-sm font-poppins">{item.label}</p>
+          </div>
+        ))}
+      </div>,
+      document.body
+    );
+  }, [
+    show,
+    pos,
+    withShadow,
+    searchInput,
+    inputValue,
+    data,
+    onLocalSearch,
+    onChange,
+  ]);
+
   return (
     <div
-      ref={ref}
+      ref={rootRef}
       className={`relative w-full ${
         disabled ? "bg-gray-200" : "bg-white"
-      } rounded-lg z-[${isFocused ? "50" : "20"}]`}
+      } rounded-lg`}
     >
       <div
+        ref={triggerRef}
+        tabIndex={0}
         onClick={() => !disabled && setShow((prev) => !prev)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className={`relative border border-solid border-gray-300 z-${
-          isFocused ? "50" : "10"
-        } w-full rounded-lg flex items-center justify-between px-4 py-2 ${
+        className={`relative border border-solid border-gray-300 w-full rounded-lg flex items-center justify-between px-4 py-2 ${
           disabled ? "cursor-not-allowed" : "cursor-pointer"
-        }`}
+        } ${isFocused ? "ring-2 ring-blue-200" : ""}`}
       >
         <p
           className={`text-sm font-poppins ${
@@ -99,69 +240,9 @@ export const DropdownRevamp: React.FC<IDropdownProps> = ({
           }`}
         />
       </div>
-      {show && (
-        <div className="relative z-20">
-          <div
-            className="absolute z-20 overflow-auto max-h-96 flex flex-col gap-1 w-full right-0 bg-white border border-solid border-gray-300 rounded-lg mt-2 px-2 py-2"
-            style={{
-              boxShadow: withShadow
-                ? "0px 8px 12px 0px rgba(0, 0, 0, 0.08)"
-                : "none",
-            }}
-          >
-            {searchInput && (
-              <div className="sticky top-0 bg-white z-20 py-2">
-                <Input
-                  value={inputValue}
-                  inputSize="md"
-                  placeholder="Search"
-                  LeftIcon={
-                    <MdOutlineSearch className="text-xl text-gray-500" />
-                  }
-                  onChange={(e) => {
-                    onSearch?.(e.target.value);
-                    if (!e.target.value) {
-                      setData(list);
-                      return;
-                    }
-                    setData((prev) =>
-                      prev.filter((item) =>
-                        item.label
-                          .toLowerCase()
-                          .includes(e.target.value.toLowerCase())
-                      )
-                    );
-                  }}
-                />
-              </div>
-            )}
-            {(data?.length
-              ? data
-              : [{ label: "Not Found", value: "Not Found", disabled: true }]
-            )?.map((item) => (
-              <div
-                onClick={() => {
-                  if (item.disabled) return;
-                  setShow((prev) => !prev);
-                  setSelected(item);
-                  onChange?.(item);
-                }}
-                className={`w-full rounded-lg flex items-center px-4 py-3 ${
-                  !item.disabled ? "hover:bg-gray-100 cursor-pointer" : ""
-                }`}
-              >
-                <p
-                  className={`text-sm font-poppins ${
-                    item.disabled ? "text-gray-500" : ""
-                  }`}
-                >
-                  {item.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
+      {/* Menu dipindah ke portal agar selalu di atas */}
+      {menu}
     </div>
   );
 };

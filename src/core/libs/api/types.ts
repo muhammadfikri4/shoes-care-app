@@ -2,8 +2,6 @@ export interface QueryParams {
   page?: number;
   perPage?: number;
   search?: string;
-  subAcaraId?: string;
-  eventMeetingId?: string;
 }
 
 export interface ApiOption {
@@ -11,7 +9,7 @@ export interface ApiOption {
   bearerToken?: string;
   headers?: HeadersInit;
   path?: string;
-  queryParams?: QueryParams;
+  queryParams?: Record<string, string>;
 }
 
 export interface MetaResponse {

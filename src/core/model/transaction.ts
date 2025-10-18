@@ -1,0 +1,83 @@
+export type PaymentMethod = 'QRIS' | 'CASH' | 'TRANSFER';
+
+export type TransactionStatus = 'CREATED' | 'IN_PROGRESS' | 'READY_FOR_PICKUP' | 'PICKED_UP' | 'CANCELLED';
+
+export interface TransactionItemModel {
+  id: string;
+  name: string;
+  qty: number;
+  unitPrice: number;
+  lineTotal: number;
+  estimateDays?: number | null;
+  photoUrl?: string | null;
+  note?: string | null;
+}
+
+export interface TransactionModel {
+  id: string;
+  invoice: string;
+  status: TransactionStatus;
+  createdAt: string;
+  price: number;
+  finalPrice: number;
+  promoApplied: boolean;
+  customerEmail?: string | null;
+  customerName?: string | null;
+  rack?: { id: string; code: string; name?: string | null } | null;
+  items?: TransactionItemModel[];
+  quantityShoes?: number;
+}
+
+export interface TransactionCreateItem {
+  shoeName: string;
+  price: number;
+  qty?: number;
+  days?: number;
+  photoUrl?: string;
+  note?: string;
+}
+
+export interface TransactionCreateRequest {
+  rackId: string;
+  customerEmail?: string;
+  customerName?: string;
+  customerPhone?: string;
+  paymentMethod?: PaymentMethod;
+  usePromo?: boolean;
+  promoCode?: string
+  items?: TransactionCreateItem[];
+  price?: number;
+}
+
+export interface TransactionListResponse {
+  rows: TransactionModel[];
+}
+
+export interface TransactionHistoryItem {
+  id: string;
+  previousStatus?: TransactionStatus | null;
+  newStatus: TransactionStatus;
+  note?: string | null;
+  changedAt: string;
+}
+
+export interface TransactionLookupModel {
+  id: string;
+  invoice: string;
+  status: TransactionStatus;
+  rack: { id: string; code: string; name?: string | null } | null;
+  price: number;
+  finalPrice: number;
+  promoApplied: boolean;
+  customerName?: string | null;
+  customerEmail?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items: TransactionItemModel[];
+  history: TransactionHistoryItem[];
+}
+
+export interface OkResponse { ok: boolean }
+
+export interface PromoVerifyRequest { email: string; code: string }
+export interface PromoVerifyResponse { valid: boolean; discountPercent: number }

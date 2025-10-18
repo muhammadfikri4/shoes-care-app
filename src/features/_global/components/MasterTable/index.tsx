@@ -22,6 +22,18 @@ interface IMasterTableProps<T extends DefaultKey> {
   pagination?: IPaginationProps;
   onClickItem?: (item: T) => void;
   notFoundMessage?: string[];
+  rounded?: {
+    "top-left"?: boolean;
+    "top-right"?: boolean;
+    "bottom-left"?: boolean;
+    "bottom-right"?: boolean;
+  };
+  border?: {
+    top?: boolean;
+    left?: boolean;
+    bottom?: boolean;
+    right?: boolean;
+  };
 }
 
 export const MasterTable = <T extends DefaultKey>({
@@ -33,10 +45,11 @@ export const MasterTable = <T extends DefaultKey>({
   pagination,
   onClickItem,
   notFoundMessage = ["Data is not found."],
+  rounded,
 }: IMasterTableProps<T>) => {
   return (
     <div className="flex flex-col">
-      <Table>
+      <Table rounded={rounded}>
         <>
           <TableHead field={title} />
           <TableBody>
@@ -76,6 +89,7 @@ export const MasterTable = <T extends DefaultKey>({
               </td>
             ) : (
               <EmptyState
+                variant="search"
                 colspan={columnTable.length + (withAction ? 1 : 0)}
                 description={notFoundMessage}
               />

@@ -4,6 +4,7 @@ import { HiDotsVertical } from "react-icons/hi";
 
 interface DropdownMenuItem {
   label: string;
+  value: string;
   icon: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
@@ -34,29 +35,30 @@ export const DropdownMenu = ({
 
     const rect = buttonRef.current.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
 
     // Position dropdown below the button
     const top = rect.bottom + scrollTop + 4; // 4px gap
-    
+
     // Calculate left position to keep dropdown within viewport
     const dropdownWidth = 224; // w-56 = 14rem = 224px
     const viewportWidth = window.innerWidth;
-    
+
     let left = rect.left + scrollLeft;
-    
+
     // If dropdown would go outside right edge, align to right
     if (left + dropdownWidth > viewportWidth) {
       left = rect.right + scrollLeft - dropdownWidth;
     }
-    
+
     // Ensure minimum left position (don't go negative)
     left = Math.max(8, left); // 8px minimum margin from left edge
 
     return { top, left };
   };
 
-  const position = getDropdownPosition()
+  const position = getDropdownPosition();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -132,7 +134,7 @@ export const DropdownMenu = ({
                 <button
                   key={`menu-item-${index}`}
                   onClick={() => {
-                    if(!item.disabled) {
+                    if (!item.disabled) {
                       item.onClick();
                       setIsOpen(false);
                     }

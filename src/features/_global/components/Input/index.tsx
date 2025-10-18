@@ -148,7 +148,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               className="absolute right-0 h-full w-[2rem]"
               onClick={onClickRightIcon}
             >
-              {RightIcon}
+              <div className="flex items-center justify-center h-full w-full px-4">
+                {RightIcon}
+              </div>
             </div>
           )}
         </div>

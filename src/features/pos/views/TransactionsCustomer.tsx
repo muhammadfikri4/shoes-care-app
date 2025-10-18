@@ -1,17 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { transactionsService } from '@core/services/pos';
 import { Badge } from "@features/_global/components/Badge";
+import { TransactionModel } from '@core/model/transaction';
 
 export const TransactionsCustomer: React.FC = () => {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<TransactionModel[]>([]);
   const load = async () => {
     const res = await transactionsService.listMine();
-    // @ts-ignore
-    setItems(res?.data || res);
+    setItems(res?.data ?? []);
   };
   useEffect(() => { load(); }, []);
 
   const format = useMemo(() => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }), []);
+  const navigate = useNavigate();
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
@@ -30,6 +32,9 @@ export const TransactionsCustomer: React.FC = () => {
             <div className="mt-1 text-sm text-slate-600">Harga: {format.format(t.price)}</div>
             <div className="mt-1 text-sm">Final: <span className="font-semibold">{format.format(t.finalPrice)}</span> {t.promoApplied && <Badge variant="success" size="sm" className="ml-2">Promo 10x</Badge>}</div>
             <div className="mt-1 text-xs text-slate-500">{new Date(t.createdAt).toLocaleString()}</div>
+            <div className="mt-3 flex justify-end">
+              <button onClick={()=>navigate(`/my/transactions/${t.invoice}`)} className="text-blue-600 hover:underline text-sm">Detail & Tracking</button>
+            </div>
           </div>
         ))}
       </div>

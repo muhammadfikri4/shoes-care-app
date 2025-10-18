@@ -1,100 +1,166 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { racksService, transactionsService } from '@core/services/pos';
-import { Badge } from "@features/_global/components/Badge";
+import { TransactionModel } from "@core/model/transaction";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { BaseLayout } from "../../_global/components/BaseLayout";
+import { Button } from "../../_global/components/Button";
+import { MasterTable } from "../../_global/components/MasterTable";
+import { CustomSection } from "../../_global/components/SmartFilter";
+import { Poppins } from "../../_global/components/Text";
+import { formatTime } from "../../_global/lib/format-time";
+import { useTransactionsList } from "../hooks/useTransactions";
+import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 
 export const TransactionsAdmin: React.FC = () => {
-  const [items, setItems] = useState<any[]>([]);
-  const [racks, setRacks] = useState<any[]>([]);
-  const [form, setForm] = useState<{rackId: string; price: number; customerEmail?: string}>({ rackId: '', price: 0, customerEmail: '' });
-  const [loading, setLoading] = useState(false);
-  const [scanQr, setScanQr] = useState('');
+  const navigate = useNavigate();
 
-  const load = async () => {
-    const res = await transactionsService.listAll();
-    // @ts-ignore
-    setItems(res?.data || res);
-    const rc = await racksService.list();
-    // @ts-ignore
-    setRacks((rc?.data || rc).filter((r:any)=>r.status==='AVAILABLE'));
-  };
-  useEffect(() => { load(); }, []);
-
-  const create = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try { await transactionsService.create(form); await load(); setForm({ rackId: '', price: 0, customerEmail: '' }); } finally { setLoading(false); }
-  };
-
-  const scan = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try { await transactionsService.scan({ qr: scanQr }); await load(); setScanQr(''); } finally { setLoading(false); }
-  };
-
-  const format = useMemo(() => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }), []);
+  const { data } = useTransactionsList();
+  const items: TransactionModel[] = (data?.data ?? []) as TransactionModel[];
+  const tableData = items.map((t: TransactionModel) => ({
+    code: t.invoice,
+    customer: { name: t.customerName || t.customerEmail || "-" },
+    date: t.createdAt,
+    status: t.status,
+    id: t.invoice,
+  }));
 
   return (
-    <div className="p-4 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Transaksi (Admin)</h1>
-          <p className="text-slate-500 text-sm">Buat transaksi baru dan konfirmasi pengambilan menggunakan QR.</p>
+    <BaseLayout
+      title="Transaksi"
+      action={{
+        children: "Tambah Transaksi",
+        onClick: () => navigate("/admin/transactions/create"),
+      }}
+    >
+      <CustomSection
+        className="w-full"
+        inputProps={{}}
+        filterButton={[
+          {
+            key: "minPrice",
+            inputProps: {
+              placeholder: "Min Harga",
+            },
+          },
+          {
+            key: "maxPrice",
+            inputProps: {
+              placeholder: "Max Harga",
+            },
+          },
+          {
+            key: "status",
+            widthClass: "w-40",
+            dropdownProps: {
+              placeholder: "Status",
+              list: [
+                {
+                  label: "Semua",
+                  value: "",
+                },
+                {
+                  label: "Pending",
+                  value: "CREATED",
+                },
+                {
+                  label: "On Process",
+                  value: "IN_PROGRESS",
+                },
+                {
+                  label: "Ready to Pick Up",
+                  value: "READY_FOR_PICKUP",
+                },
+                {
+                  label: "Completed",
+                  value: "COMPLETED",
+                },
+              ],
+            },
+          },
+        ]}
+      >
+        {/* Mobile cards */}
+        <div className="md:hidden space-y-3">
+          {items.map((t) => (
+            <div
+              key={t.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
+            >
+              <div className="flex items-center justify-between">
+                <Poppins className="text-sm font-semibold">{t.invoice}</Poppins>
+                <TransactionStatusBadge status={t.status} />
+              </div>
+              <div className="mt-1 text-xs text-slate-600">
+                {t.customerName || t.customerEmail || "-"}
+              </div>
+              <div className="mt-1 text-xs text-slate-500">
+                {formatTime(new Date(t.createdAt), false)}
+              </div>
+              <div className="mt-3 flex justify-end">
+                <Button
+                  size="md"
+                  variant="secondary"
+                  onClick={() => navigate(`/admin/transactions/${t.invoice}`)}
+                >
+                  Detail
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+        {!items.length && (
+          <div className="text-center text-sm text-slate-500 py-6">
+            Tidak ada transaksi.
+          </div>
+        )}
 
-      <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-        <form onSubmit={create} className="grid md:grid-cols-5 grid-cols-1 gap-3">
-          <select className="border p-2 rounded" value={form.rackId} onChange={e=>setForm({...form, rackId: e.target.value})} required>
-            <option value="">Pilih Rak (Available)</option>
-            {racks.map((r:any)=> <option key={r.id} value={r.id}>{r.code} - {r.name||'-'}</option>)}
-          </select>
-          <input className="border p-2 rounded" type="number" placeholder="Harga" value={form.price} onChange={e=>setForm({...form, price: Number(e.target.value)})} required />
-          <input className="border p-2 rounded" placeholder="Email Customer (opsional)" value={form.customerEmail} onChange={e=>setForm({...form, customerEmail: e.target.value})} />
-          <div className="md:col-span-2 flex items-center"><button disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 transition text-white rounded p-2">{loading? 'Menyimpan...' : 'Buat Transaksi'}</button></div>
-        </form>
-      </div>
-
-      <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-        <form onSubmit={scan} className="grid md:grid-cols-6 grid-cols-1 gap-3">
-          <input className="border p-2 rounded md:col-span-5" placeholder="Scan/Tempel QR String (contoh: sc-pos:tx:INV-...)" value={scanQr} onChange={e=>setScanQr(e.target.value)} />
-          <button disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 transition text-white rounded p-2">{loading? 'Memproses...' : 'Konfirmasi Ambil'}</button>
-        </form>
-      </div>
-
-      <div className="bg-white rounded-xl p-0 border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Invoice</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Customer</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Rak</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Harga</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Final</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Promo</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Status</th>
-                <th className="p-3 text-left text-sm font-medium text-slate-600">Waktu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((t:any)=> (
-                <tr key={t.id} className="border-t">
-                  <td className="p-3">{t.invoice}</td>
-                  <td className="p-3">{t.customer?.email || '-'}</td>
-                  <td className="p-3">{t.rack?.code}</td>
-                  <td className="p-3">{format.format(t.price)}</td>
-                  <td className="p-3">{format.format(t.finalPrice)}</td>
-                  <td className="p-3">{t.promoApplied? <Badge variant="success" size="sm">Gratis</Badge> : '-'}</td>
-                  <td className="p-3">
-                    <Badge variant={t.status === 'PICKED_UP' ? 'success' : t.status === 'CREATED' ? 'warning' : 'secondary'} size="sm">{t.status}</Badge>
-                  </td>
-                  <td className="p-3">{new Date(t.createdAt).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Desktop table */}
+        <div className="hidden md:block">
+          <MasterTable
+            rounded={{
+              "bottom-left": false,
+              "bottom-right": false,
+              "top-left": false,
+              "top-right": false,
+            }}
+            data={tableData}
+            title={["Code", "Customer", "Tanggal", "Status", "Aksi"]}
+            columnTable={[
+              {
+                return: ({ code }) => (
+                  <Poppins className="text-sm">{code}</Poppins>
+                ),
+              },
+              {
+                return: ({ customer }) => (
+                  <Poppins className="text-sm">{customer?.name}</Poppins>
+                ),
+              },
+              {
+                return: ({ date }) => (
+                  <Poppins className="text-sm">
+                    {formatTime(new Date(date), false)}
+                  </Poppins>
+                ),
+              },
+              {
+                return: ({ status }) => (
+                  <Poppins className="text-sm">{status}</Poppins>
+                ),
+              },
+              {
+                return: ({ id }) => (
+                  <Button
+                    variant="secondary"
+                    onClick={() => navigate(`/admin/transactions/${id}`)}
+                  >
+                    Detail
+                  </Button>
+                ),
+              },
+            ]}
+          />
         </div>
-      </div>
-    </div>
+      </CustomSection>
+    </BaseLayout>
   );
 };

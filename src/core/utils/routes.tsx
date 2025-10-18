@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { NotFound } from "../../features/_global/components/NotFound";
-import { RootViews } from "../../features/_global/views";
+
 import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
 import { ChatsViews } from "../../features/chats/views/ChatsViews";
@@ -8,13 +8,17 @@ import { ProfileViews } from "../../features/profile/views/ProfileViews";
 import { FriendsViews } from "../../features/friends/views/FriendsViews";
 import { RacksManagement } from "../../features/pos/views/RacksManagement";
 import { TransactionsAdmin } from "../../features/pos/views/TransactionsAdmin";
+import { TransactionCreate } from "../../features/pos/views/TransactionCreate";
 import { TransactionsCustomer } from "../../features/pos/views/TransactionsCustomer";
+import { CheckQR } from "../../features/pos/views/CheckQR";
+import { TransactionDetail } from "../../features/pos/views/TransactionDetail";
 import { CustomerOtpLogin } from "../../features/auth/views/CustomerOtpLogin";
+import { RootLayout } from "../../features/_global/views/Root";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootViews />,
+    element: <RootLayout />,
     children: [
       {
         path: "/chats",
@@ -37,8 +41,24 @@ export const router = createBrowserRouter([
         element: <TransactionsAdmin />,
       },
       {
+        path: "/admin/transactions/create",
+        element: <TransactionCreate />,
+      },
+      {
+        path: "/admin/transactions/:invoice",
+        element: <TransactionDetail />,
+      },
+      {
         path: "/my/transactions",
         element: <TransactionsCustomer />,
+      },
+      {
+        path: "/my/transactions/:invoice",
+        element: <TransactionDetail />,
+      },
+      {
+        path: "/check-qr",
+        element: <CheckQR />,
       },
     ],
   },

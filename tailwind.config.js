@@ -8,7 +8,8 @@ module.exports = withMT({
   theme: {
     extend: {
       colors: {
-        primary: "#3369FF",
+        primary: "#0F60FF",
+        "primary-hover": "#0546C5",
       },
     },
   },

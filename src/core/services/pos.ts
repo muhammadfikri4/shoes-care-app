@@ -1,26 +1,76 @@
 import { API_ENDPOINT } from "@core/configs/app";
 import { request } from "@core/libs/api/config";
 import { ApiResponse } from "@core/libs/api/types";
+import { RackModel } from "@core/model/rack";
+import {
+  OkResponse,
+  TransactionCreateRequest,
+  TransactionLookupModel,
+  TransactionModel,
+} from "@core/model/transaction";
 
 // Racks
 export const racksService = {
-  list: request.get<ApiResponse<any[]>>(API_ENDPOINT.pos.racks),
-  create: request.post<ApiResponse<any>, { code: string; name?: string; location?: string }>(API_ENDPOINT.pos.racks),
-  update: (id: string) => request.put<ApiResponse<any>, { code?: string; name?: string; location?: string }>(`${API_ENDPOINT.pos.racks}/${id}`),
-  remove: (id: string) => request.delete<ApiResponse<any>>(`${API_ENDPOINT.pos.racks}/${id}`),
+  list: request.get<ApiResponse<RackModel[]>>(API_ENDPOINT.pos.racks),
+  create: request.post<
+    ApiResponse<RackModel>,
+    { code: string; name?: string; location?: string }
+  >(API_ENDPOINT.pos.racks),
+  update: (id: string) =>
+    request.put<
+      ApiResponse<RackModel>,
+      { code?: string; name?: string; location?: string }
+    >(`${API_ENDPOINT.pos.racks}/${id}`),
+  remove: (id: string) =>
+    request.delete<ApiResponse<OkResponse>>(`${API_ENDPOINT.pos.racks}/${id}`),
 };
 
 // Transactions
 export const transactionsService = {
-  listAll: request.get<ApiResponse<any[]>>(API_ENDPOINT.pos.transactions),
-  listMine: request.get<ApiResponse<any[]>>(API_ENDPOINT.pos.transactionsMy),
-  create: request.post<ApiResponse<any>, { rackId: string; price: number; customerEmail?: string }>(API_ENDPOINT.pos.transactions),
-  scan: request.post<ApiResponse<any>, { qr: string }>(API_ENDPOINT.pos.transactionsScan),
+  list: request.get<ApiResponse<TransactionModel[]>>(
+    API_ENDPOINT.pos.transactions
+  ),
+  listMine: request.get<ApiResponse<TransactionModel[]>>(
+    API_ENDPOINT.pos.transactionsMy
+  ),
+  create: (body: TransactionCreateRequest) =>
+    request.post<ApiResponse<TransactionModel>, TransactionCreateRequest>(
+      API_ENDPOINT.pos.transactions
+    )(body),
+  createWithFiles: (body: TransactionCreateRequest & { files?: (File | null | undefined)[] }) => {
+    const fd = new FormData();
+    // Clone without files to payload
+    const { files, ...rest } = body;
+    fd.append('payload', JSON.stringify(rest));
+    (files || []).forEach((f) => { if (f) fd.append('photos', f); });
+    return request.post<ApiResponse<TransactionModel>, FormData>(
+      API_ENDPOINT.pos.transactions
+    )(fd, { contentType: 'form-data' });
+  },
+  scan: request.post<ApiResponse<OkResponse>, { qr: string }>(
+    API_ENDPOINT.pos.transactionsScan
+  ),
+  lookup: (query: { qr?: string; invoice?: string }) =>
+    request.get<ApiResponse<TransactionLookupModel>>(
+      API_ENDPOINT.pos.transactionsLookup
+    )({
+      queryParams: {
+        ...(query.qr && { qr: query.qr }),
+        ...(query.invoice && { invoice: query.invoice }),
+      },
+    }),
+  verifyPromo: request.post<
+    ApiResponse<import("@core/model/transaction").PromoVerifyResponse>,
+    import("@core/model/transaction").PromoVerifyRequest
+  >(`${API_ENDPOINT.pos.transactions}/promo/verify`),
 };
 
 // OTP Auth
 export const otpAuthService = {
-  request: request.post<ApiResponse<any>, { email: string; name?: string }>(API_ENDPOINT.authOtp.request),
-  verify: request.post<ApiResponse<any>, { email: string; otp: string }>(API_ENDPOINT.authOtp.verify),
+  request: request.post<ApiResponse<unknown>, { email: string; name?: string }>(
+    API_ENDPOINT.authOtp.request
+  ),
+  verify: request.post<ApiResponse<unknown>, { email: string; otp: string }>(
+    API_ENDPOINT.authOtp.verify
+  ),
 };
-
