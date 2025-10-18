@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  scrollbar-width: none;
+}
+
+html, body{
+  scrollbar-width: none;
+}
+
+ul[role="listbox"] {
+  @apply max-h-40;
+}
+
+#poppins {
+  font-family: 'Poppins' !important;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200%;
+  }
+  100% {
+    background-position: -200%;
+  }
+}
+
+.sun-editor-editable {
+  min-height: 300px !important;
+}
+
+pre {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border: 1.5px solid #b1b1b1;
+  border-radius: 10px;
+  font-family: 'Courier New', monospace;
+  overflow-x: auto;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 1rem 0;
+}
+
+/* ul, ol {
+  list-style: square;
+} */
+
+ul, ol {
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style-type: disc;
+}
+li  {
+  margin-bottom: 4px;
+}

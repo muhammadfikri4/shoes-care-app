@@ -1,0 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare module '@material-tailwind/react' {
+  export const Input: any;
+  export const Checkbox: any;
+  export const Button: any;
+  export const Typography: any;
+  export const IconButton: any;
+  export const Breadcrumbs: any;
+  export const Navbar: any;
+  export const Card: any;
+  export const CardBody: any;
+  export const CardHeader: any;
+  export const Avatar: any;
+  export const Select: any;
+  export const Option: any;
+  export const Textarea: any;
+  export const Chip: any;
+  export const Popover: any;
+  export const PopoverContent: any;
+  export const PopoverHandler: any;
+  export const ButtonGroup: any;
+  export const MenuItem: any;
+  export const Drawer: any;
+  export const Switch: any
+}
