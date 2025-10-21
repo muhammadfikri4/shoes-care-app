@@ -33,19 +33,22 @@ export const transactionsService = {
   listMine: request.get<ApiResponse<TransactionModel[]>>(
     API_ENDPOINT.pos.transactionsMy
   ),
-  create: (body: TransactionCreateRequest) =>
-    request.post<ApiResponse<TransactionModel>, TransactionCreateRequest>(
-      API_ENDPOINT.pos.transactions
-    )(body),
-  createWithFiles: (body: TransactionCreateRequest & { files?: (File | null | undefined)[] }) => {
+  create: request.post<ApiResponse<TransactionModel>, FormData>(
+    API_ENDPOINT.pos.transactions
+  ),
+  createWithFiles: (
+    body: TransactionCreateRequest & { files?: (File | null | undefined)[] }
+  ) => {
     const fd = new FormData();
     // Clone without files to payload
     const { files, ...rest } = body;
-    fd.append('payload', JSON.stringify(rest));
-    (files || []).forEach((f) => { if (f) fd.append('photos', f); });
+    fd.append("payload", JSON.stringify(rest));
+    (files || []).forEach((f) => {
+      if (f) fd.append("photos", f);
+    });
     return request.post<ApiResponse<TransactionModel>, FormData>(
       API_ENDPOINT.pos.transactions
-    )(fd, { contentType: 'form-data' });
+    )(fd, { contentType: "form-data" });
   },
   scan: request.post<ApiResponse<OkResponse>, { qr: string }>(
     API_ENDPOINT.pos.transactionsScan

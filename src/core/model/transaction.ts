@@ -1,6 +1,7 @@
 export type PaymentMethod = 'QRIS' | 'CASH' | 'TRANSFER';
 
 export type TransactionStatus = 'CREATED' | 'IN_PROGRESS' | 'READY_FOR_PICKUP' | 'PICKED_UP' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
 
 export interface TransactionItemModel {
   id: string;
@@ -8,7 +9,7 @@ export interface TransactionItemModel {
   qty: number;
   unitPrice: number;
   lineTotal: number;
-  estimateDays?: number | null;
+  estimateDay?: number | null;
   photoUrl?: string | null;
   note?: string | null;
 }
@@ -21,6 +22,13 @@ export interface TransactionModel {
   price: number;
   finalPrice: number;
   promoApplied: boolean;
+  paymentMethod?: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  paidAt?: string | null;
+  cashPaid?: number | null;
+  cashChange?: number | null;
+  midtransToken?: string | null;
+  midtransRedirectUrl?: string | null;
   customerEmail?: string | null;
   customerName?: string | null;
   rack?: { id: string; code: string; name?: string | null } | null;
@@ -38,13 +46,13 @@ export interface TransactionCreateItem {
 }
 
 export interface TransactionCreateRequest {
-  rackId: string;
   customerEmail?: string;
   customerName?: string;
   customerPhone?: string;
   paymentMethod?: PaymentMethod;
   usePromo?: boolean;
   promoCode?: string
+  cashPaid?: number
   items?: TransactionCreateItem[];
   price?: number;
 }

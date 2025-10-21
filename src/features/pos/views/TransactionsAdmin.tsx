@@ -107,11 +107,11 @@ export const TransactionsAdmin: React.FC = () => {
             </div>
           ))}
         </div>
-        {!items.length && (
+        {/* {!items.length && (
           <div className="text-center text-sm text-slate-500 py-6">
             Tidak ada transaksi.
           </div>
-        )}
+        )} */}
 
         {/* Desktop table */}
         <div className="hidden md:block">

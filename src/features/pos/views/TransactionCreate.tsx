@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { transactionsService } from "../../../core/services/pos";
+import { toast } from "react-toastify";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp";
@@ -24,13 +23,13 @@ type ItemForm = {
 };
 
 export const TransactionCreate: React.FC = () => {
-  const navigate = useNavigate();
   const [form, setForm] = useState({
     customerName: "",
     customerEmail: "",
     customerPhone: "",
     paymentMethod: "QRIS" as "QRIS" | "CASH" | "TRANSFER",
     usePromo: false,
+    cashPaid: 0,
     promoCode: "",
     items: [
       {
@@ -43,7 +42,6 @@ export const TransactionCreate: React.FC = () => {
       },
     ] as ItemForm[],
   });
-  const [saving, setSaving] = useState(false);
   const createMutation = useTransactionCreate();
   const promoVerify = usePromoVerify();
   const { data: racksData } = useRacksList();
@@ -88,59 +86,30 @@ export const TransactionCreate: React.FC = () => {
 
   const submit = async () => {
     if (!form.customerName.trim() || !form.customerEmail.trim()) {
-      alert("Customer Name dan Email wajib diisi");
+      toast.error("Customer Name dan Email wajib diisi");
       return;
     }
     const firstRack = form.items.find((i) => i.rack?.id);
     if (!firstRack?.rack.id) {
-      alert("Pilih minimal satu Nomor Rak pada Items");
+      toast.error("Pilih minimal satu Nomor Rak pada Items");
       return;
     }
-    setSaving(true);
-    try {
-      const files = form.items.map((it) => it.photo).filter(Boolean) as File[];
-      await (files.length
-        ? await transactionsService.createWithFiles({
-            rackId: firstRack.rack?.id,
-            customerEmail: form.customerEmail,
-            customerName: form.customerName,
-            customerPhone: form.customerPhone,
-            paymentMethod: form.paymentMethod,
-            usePromo: form.usePromo,
-            promoCode: form.promoCode,
-            items: form.items.map((it) => ({
-              shoeName: it.shoeName,
-              price: it.price,
-              qty: 1,
-              days: it.days,
-              note: it.note,
-            })),
-            price: total,
-            files,
-          })
-        : createMutation.mutateAsync({
-            rackId: firstRack.rack?.id,
-            customerEmail: form.customerEmail,
-            customerName: form.customerName,
-            customerPhone: form.customerPhone,
-            paymentMethod: form.paymentMethod,
-            usePromo: form.usePromo,
-            promoCode: form.promoCode,
-            items: form.items.map((it) => ({
-              shoeName: it.shoeName,
-              price: it.price,
-              qty: 1,
-              days: it.days,
-              note: it.note,
-            })),
-            price: total,
-          }));
-      navigate("/admin/transactions");
-    } catch (e) {
-      alert(e || "Gagal membuat transaksi");
-    } finally {
-      setSaving(false);
-    }
+    const formData = new FormData();
+    formData.append("customerEmail", form.customerEmail);
+    formData.append("customerName", form.customerName);
+    formData.append("customerPhone", form.customerPhone);
+    formData.append("paymentMethod", form.paymentMethod);
+    formData.append("usePromo", String(form.usePromo));
+    formData.append("promoCode", form.promoCode);
+    formData.append("cashPaid", String(form.cashPaid));
+    form.items.forEach((it, i) => {
+      formData.append(`items[${i}][name]`, it.shoeName);
+      formData.append(`items[${i}][price]`, String(it.price));
+      formData.append(`items[${i}][estimateDay]`, String(it.days));
+      if (it.note) formData.append(`items[${i}][note]`, it.note);
+      if (it.photo) formData.append(`items[${i}][file]`, it.photo);
+    });
+    createMutation.mutate(formData);
   };
 
   return (
@@ -258,6 +227,37 @@ export const TransactionCreate: React.FC = () => {
                     {promoVerify.data?.data?.discountPercent ?? 0}%
                   </div>
                 )}
+              </div>
+            )}
+            {form.paymentMethod === "CASH" && (
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                <div>
+                  <div className="text-sm text-slate-600 mb-1">
+                    Uang Diterima
+                  </div>
+                  <Input
+                    type="number"
+                    value={form.cashPaid || undefined}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        cashPaid: Number(e.target.value || 0),
+                      }))
+                    }
+                    placeholder="Jumlah uang"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <div className="text-sm text-slate-600 mb-1">Kembalian</div>
+                  <div className="border rounded px-3 py-2 bg-slate-50">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(
+                      Math.max(0, Number(form.cashPaid || 0) - (total || 0))
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -383,9 +383,11 @@ export const TransactionCreate: React.FC = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-md z-30">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="font-semibold">Total: {format.format(total)}</div>
-            <Button onClick={submit} disabled={saving}>
-              {saving ? "Loading..." : "Submit"}
-            </Button>
+            <div>
+              <Button onClick={submit} disabled={createMutation.isPending}>
+                {createMutation.isPending ? "Loading..." : "Submit"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
