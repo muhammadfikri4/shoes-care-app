@@ -1,5 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import {
+  TransactionCreationDTO,
+  TransactionItem,
+} from "../../../core/model/transaction";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp";
@@ -7,41 +11,13 @@ import { InputFile } from "../../_global/components/File";
 import { Input } from "../../_global/components/Input";
 import { Poppins } from "../../_global/components/Text";
 import { TextArea } from "../../_global/components/TextArea";
+import { defaultValue } from "../const";
 import { useRacksList } from "../hooks/useRacks";
 import { usePromoVerify, useTransactionCreate } from "../hooks/useTransactions";
-
-type ItemForm = {
-  rack: {
-    id: string;
-    name: string;
-  };
-  shoeName: string;
-  price: number;
-  days: number;
-  photo?: File | null;
-  note?: string;
-};
+import { buildFormData } from "../utils/build-form-data";
 
 export const TransactionCreate: React.FC = () => {
-  const [form, setForm] = useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    paymentMethod: "QRIS" as "QRIS" | "CASH" | "TRANSFER",
-    usePromo: false,
-    cashPaid: 0,
-    promoCode: "",
-    items: [
-      {
-        rack: { id: "", name: "" },
-        shoeName: "",
-        price: 0,
-        days: 7,
-        photo: null as File | null,
-        note: "",
-      },
-    ] as ItemForm[],
-  });
+  const [form, setForm] = useState<TransactionCreationDTO>(defaultValue);
   const createMutation = useTransactionCreate();
   const promoVerify = usePromoVerify();
   const { data: racksData } = useRacksList();
@@ -63,11 +39,11 @@ export const TransactionCreate: React.FC = () => {
         ...prev.items,
         {
           rack: { id: "", name: "" },
-          shoeName: "",
+          name: "",
           price: 0,
-          days: 7,
-          photo: null,
-          note: "",
+          estimateDay: 0,
+          file: undefined,
+          note: undefined,
         },
       ],
     }));
@@ -77,7 +53,7 @@ export const TransactionCreate: React.FC = () => {
       items: prev.items.filter((_, i) => i !== idx),
     }));
 
-  const updateItem = (idx: number, patch: Partial<ItemForm>) => {
+  const updateItem = (idx: number, patch: Partial<TransactionItem>) => {
     setForm((prev) => ({
       ...prev,
       items: prev.items.map((it, i) => (i === idx ? { ...it, ...patch } : it)),
@@ -94,21 +70,7 @@ export const TransactionCreate: React.FC = () => {
       toast.error("Pilih minimal satu Nomor Rak pada Items");
       return;
     }
-    const formData = new FormData();
-    formData.append("customerEmail", form.customerEmail);
-    formData.append("customerName", form.customerName);
-    formData.append("customerPhone", form.customerPhone);
-    formData.append("paymentMethod", form.paymentMethod);
-    formData.append("usePromo", String(form.usePromo));
-    formData.append("promoCode", form.promoCode);
-    formData.append("cashPaid", String(form.cashPaid));
-    form.items.forEach((it, i) => {
-      formData.append(`items[${i}][name]`, it.shoeName);
-      formData.append(`items[${i}][price]`, String(it.price));
-      formData.append(`items[${i}][estimateDay]`, String(it.days));
-      if (it.note) formData.append(`items[${i}][note]`, it.note);
-      if (it.photo) formData.append(`items[${i}][file]`, it.photo);
-    });
+    const formData = buildFormData(form);
     createMutation.mutate(formData);
   };
 
@@ -313,9 +275,9 @@ export const TransactionCreate: React.FC = () => {
                     </Poppins>
                     <Input
                       className="border p-2 rounded w-full"
-                      value={it.shoeName}
+                      value={it.name}
                       onChange={(e) =>
-                        updateItem(idx, { shoeName: e.target.value })
+                        updateItem(idx, { name: e.target.value })
                       }
                       placeholder="Contoh: Nike Air"
                     />
@@ -339,8 +301,9 @@ export const TransactionCreate: React.FC = () => {
                     <Input
                       inputMode="decimal"
                       type="number"
+                      value={it.estimateDay || undefined}
                       onChange={(e) =>
-                        updateItem(idx, { days: Number(e.target.value) })
+                        updateItem(idx, { estimateDay: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -350,10 +313,12 @@ export const TransactionCreate: React.FC = () => {
                     </Poppins>
 
                     <InputFile
-                      selectedFile={it.photo ? [it.photo] : []}
-                      resetDefaultImage={() => updateItem(idx, { photo: null })}
+                      selectedFile={it.file ? [it.file] : []}
+                      resetDefaultImage={() =>
+                        updateItem(idx, { file: undefined })
+                      }
                       handleFileChange={(e) =>
-                        updateItem(idx, { photo: e?.[0] || null })
+                        updateItem(idx, { file: e?.[0] || null })
                       }
                     />
                   </div>
@@ -384,7 +349,10 @@ export const TransactionCreate: React.FC = () => {
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="font-semibold">Total: {format.format(total)}</div>
             <div>
-              <Button onClick={submit} disabled={createMutation.isPending}>
+              <Button
+                onClick={submit}
+                variant={createMutation.isPending ? "disabled" : "primary"}
+              >
                 {createMutation.isPending ? "Loading..." : "Submit"}
               </Button>
             </div>

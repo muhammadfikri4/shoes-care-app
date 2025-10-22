@@ -9,8 +9,8 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
 
   return (
     <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-      <div className="flex items-center justify-end px-8 py-4">
-        <div className="flex items-center gap-6">
+      <div className="ml-auto w-full px-4 md:px-8 md:w-[1200px]">
+        <div className="flex items-center justify-end py-4 gap-6">
           <div className="text-right">
             <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
             <p className="text-xs text-slate-500">{user?.email}</p>

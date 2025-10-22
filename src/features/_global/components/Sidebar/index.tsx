@@ -136,6 +136,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
+        onMouseEnter={() => onOpenChange?.(true)}
+        onMouseLeave={() => onOpenChange?.(false)}
         onClick={(e) => e.stopPropagation()}
         className={[
           "bg-white shadow-lg fixed left-0 top-0 bottom-0 z-[999]",
@@ -172,7 +174,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               path={item.path}
               label={item.label}
               open={effectiveOpen}
-              onSelect={() => { if (isMobile) setOpen(false); }}
+              onSelect={() => {
+                if (isMobile) setOpen(false);
+              }}
             />
           ))}
         </nav>

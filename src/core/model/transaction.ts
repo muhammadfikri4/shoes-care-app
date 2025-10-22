@@ -1,7 +1,12 @@
-export type PaymentMethod = 'QRIS' | 'CASH' | 'TRANSFER';
+export type PaymentMethod = "QRIS" | "CASH";
 
-export type TransactionStatus = 'CREATED' | 'IN_PROGRESS' | 'READY_FOR_PICKUP' | 'PICKED_UP' | 'CANCELLED';
-export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+export type TransactionStatus =
+  | "CREATED"
+  | "IN_PROGRESS"
+  | "READY_FOR_PICKUP"
+  | "PICKED_UP"
+  | "CANCELLED";
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
 
 export interface TransactionItemModel {
   id: string;
@@ -51,8 +56,8 @@ export interface TransactionCreateRequest {
   customerPhone?: string;
   paymentMethod?: PaymentMethod;
   usePromo?: boolean;
-  promoCode?: string
-  cashPaid?: number
+  promoCode?: string;
+  cashPaid?: number;
   items?: TransactionCreateItem[];
   price?: number;
 }
@@ -85,7 +90,35 @@ export interface TransactionLookupModel {
   history: TransactionHistoryItem[];
 }
 
-export interface OkResponse { ok: boolean }
+export interface OkResponse {
+  ok: boolean;
+}
 
-export interface PromoVerifyRequest { email: string; code: string }
-export interface PromoVerifyResponse { valid: boolean; discountPercent: number }
+export interface PromoVerifyRequest {
+  email: string;
+  code: string;
+}
+export interface PromoVerifyResponse {
+  valid: boolean;
+  discountPercent: number;
+}
+
+export interface TransactionItem {
+  rack: { id: string; name: string };
+  name: string;
+  price: number;
+  estimateDay: number;
+  file?: File;
+  note?: string;
+}
+
+export interface TransactionCreationDTO {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  paymentMethod: PaymentMethod;
+  usePromo: boolean;
+  cashPaid: number;
+  promoCode: string;
+  items: TransactionItem[];
+}

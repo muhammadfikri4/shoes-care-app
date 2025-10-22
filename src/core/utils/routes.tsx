@@ -5,12 +5,12 @@ import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
 import { ProfileViews } from "../../features/profile/views/ProfileViews";
 import { FriendsViews } from "../../features/friends/views/FriendsViews";
-import { RacksManagement } from "../../features/pos/views/RacksManagement";
-import { TransactionsAdmin } from "../../features/pos/views/TransactionsAdmin";
-import { TransactionCreate } from "../../features/pos/views/TransactionCreate";
-import { TransactionsCustomer } from "../../features/pos/views/TransactionsCustomer";
-import { CheckQR } from "../../features/pos/views/CheckQR";
-import { TransactionDetail } from "../../features/pos/views/TransactionDetail";
+import { RacksManagement } from "../../features/transactions/views/RacksManagement";
+import { TransactionsAdmin } from "../../features/transactions/views/TransactionsAdmin";
+import { TransactionCreate } from "../../features/transactions/views/TransactionCreate";
+import { TransactionsCustomer } from "../../features/transactions/views/TransactionsCustomer";
+import { CheckQR } from "../../features/transactions/views/CheckQR";
+import { TransactionDetail } from "../../features/transactions/views/TransactionDetail";
 import { CustomerOtpLogin } from "../../features/auth/views/CustomerOtpLogin";
 import { RootLayout } from "../../features/_global/views/Root";
 

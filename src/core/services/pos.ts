@@ -4,7 +4,7 @@ import { ApiResponse } from "@core/libs/api/types";
 import { RackModel } from "@core/model/rack";
 import {
   OkResponse,
-  TransactionCreateRequest,
+  PromoVerifyResponse,
   TransactionLookupModel,
   TransactionModel,
 } from "@core/model/transaction";
@@ -36,20 +36,6 @@ export const transactionsService = {
   create: request.post<ApiResponse<TransactionModel>, FormData>(
     API_ENDPOINT.pos.transactions
   ),
-  createWithFiles: (
-    body: TransactionCreateRequest & { files?: (File | null | undefined)[] }
-  ) => {
-    const fd = new FormData();
-    // Clone without files to payload
-    const { files, ...rest } = body;
-    fd.append("payload", JSON.stringify(rest));
-    (files || []).forEach((f) => {
-      if (f) fd.append("photos", f);
-    });
-    return request.post<ApiResponse<TransactionModel>, FormData>(
-      API_ENDPOINT.pos.transactions
-    )(fd, { contentType: "form-data" });
-  },
   scan: request.post<ApiResponse<OkResponse>, { qr: string }>(
     API_ENDPOINT.pos.transactionsScan
   ),
@@ -62,10 +48,9 @@ export const transactionsService = {
         ...(query.invoice && { invoice: query.invoice }),
       },
     }),
-  verifyPromo: request.post<
-    ApiResponse<import("@core/model/transaction").PromoVerifyResponse>,
-    import("@core/model/transaction").PromoVerifyRequest
-  >(`${API_ENDPOINT.pos.transactions}/promo/verify`),
+  verifyPromo: request.post<ApiResponse<PromoVerifyResponse>>(
+    `${API_ENDPOINT.pos.transactions}/promo/verify`
+  ),
 };
 
 // OTP Auth

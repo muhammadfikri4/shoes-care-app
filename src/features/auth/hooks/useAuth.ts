@@ -26,7 +26,7 @@ export const useLogin = () => {
     onSuccess: (res) => {
       toast.success(res.message);
       localStorage.setItem(CONFIG_APP.TOKEN_KEY, res?.data?.token ?? "");
-      navigate("/chats");
+      navigate("/admin/transactions");
     },
   });
 };

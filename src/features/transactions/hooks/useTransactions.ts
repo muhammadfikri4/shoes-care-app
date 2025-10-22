@@ -64,5 +64,7 @@ export const usePromoVerify = () => {
     mutationKey: ["promo-verify"],
     mutationFn: (body: PromoVerifyRequest) =>
       transactionsService.verifyPromo(body),
+    onError: (err) => toast.error(err.message),
+    onSuccess: (res) => toast.success(res.message),
   });
 };
