@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react";
-import React from "react";
+import React, { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { BreadCrumb } from "../BreadCrumb";
 import { BreadCrumbProps } from "../BreadCrumb/types";
@@ -21,7 +21,8 @@ export interface PageLayoutProps {
   className?: string; // tambahan kelas wrapper
   headerClassName?: string; // tambahan kelas header
   children: React.ReactNode;
-  action?: IButtonProps;
+  action?: IButtonProps | ReactNode;
+  actionType?: "button" | "node";
 }
 
 export const BaseLayout: React.FC<PageLayoutProps> = ({
@@ -32,6 +33,7 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
   headerClassName,
   children,
   action,
+  actionType = "button",
 }) => {
   const navigate = useNavigate();
   const [open] = useAtom(SidebarAtom);
@@ -51,7 +53,9 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
   return (
     <div
       className={[
-        `w-full ${open ? 'md:pl-64' : 'md:pl-16'} py-4 mx-auto space-y-6`,
+        `w-full duration-300 ${
+          open ? "md:pl-64" : "md:pl-16"
+        } py-4 mx-auto space-y-6`,
         className || "",
       ].join()}
     >
@@ -93,9 +97,13 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
             )}
           </div>
         )}
-        {action && (
+      {!!action && (  /* <- cast ke boolean agar bukan children */
           <div>
-            <Button {...action} />
+            {actionType === "node" ? (
+              action as ReactNode
+            ) : (
+              <Button {...(action as IButtonProps)} />
+            )}
           </div>
         )}
       </div>

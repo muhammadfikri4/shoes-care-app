@@ -11,6 +11,7 @@ import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
 import { useRacksList } from "../hooks/useRacks";
 import { InputLabel } from "../../_global/components/InputLabel";
+import { BaseLayout } from "../../_global/components/BaseLayout";
 
 type RackPayload = {
   code: string;
@@ -121,22 +122,13 @@ export const RacksManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Manajemen Rak</h1>
-          <p className="text-slate-500 text-sm">
-            Kelola rak penitipan sepatu untuk proses cuci.
-          </p>
-        </div>
-        <div>
-          {" "}
-          <Button onClick={openCreate} variant="primary">
-            Tambah Rak
-          </Button>
-        </div>
-      </div>
-
+    <BaseLayout
+      title="Manajemen Rak"
+      action={{
+        children: "Tambah Rak",
+        onClick: openCreate,
+      }}
+    >
       <CustomSection>
         <MasterTable
           border={{ bottom: true, top: true, left: true, right: true }}
@@ -255,13 +247,10 @@ export const RacksManagement: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </BaseLayout>
   );
 };
 
-/** -----------------------------
- *  Form Reusable untuk Drawer
- *  ----------------------------- */
 const RackForm: React.FC<{
   form: RackPayload;
   setForm: React.Dispatch<React.SetStateAction<RackPayload>>;

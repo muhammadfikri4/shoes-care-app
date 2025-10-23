@@ -20,10 +20,8 @@ export function useQrScanner(onResult: QrResultHandler) {
   const [error, setError] = useState<string | null>(null);
   const [facing, setFacing] = useState<Facing>("environment");
 
-  const stop = useCallback(async () => {
-    try {
-      await scannerRef.current?.stop();
-    } catch {}
+  const stop = useCallback(() => {
+    scannerRef.current?.stop();
     setActive(false);
   }, []);
 
@@ -87,9 +85,10 @@ export function useQrScanner(onResult: QrResultHandler) {
         const has = await scanner.hasFlash();
         setHasTorch(has);
         setTorchOn(false);
-      } catch (e: any) {
-        setError(e?.message || "Tidak bisa mengakses kamera");
-        await stop();
+      } catch (e) {
+        const err = e as Error;
+        setError(err?.message || "Tidak bisa mengakses kamera");
+        stop();
       }
     },
     [listAndSetCameras, onResult, stop]
@@ -110,8 +109,9 @@ export function useQrScanner(onResult: QrResultHandler) {
         const has = await scannerRef.current.hasFlash();
         setHasTorch(has);
         setTorchOn(false);
-      } catch (e: any) {
-        setError(e?.message || "Gagal mengganti kamera");
+      } catch (e) {
+        const err = e as Error;
+        setError(err?.message || "Gagal mengganti kamera");
       }
     },
     [cameras]
@@ -159,8 +159,9 @@ export function useQrScanner(onResult: QrResultHandler) {
         await scannerRef.current.turnFlashOn();
         setTorchOn(true);
       }
-    } catch (e: any) {
-      setError(e?.message || "Gagal mengatur flash");
+    } catch (e) {
+      const err = e as Error;
+      setError(err?.message || "Gagal mengatur flash");
     }
   }, [torchOn]);
 
