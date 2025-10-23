@@ -78,42 +78,49 @@ export const TransactionsAdmin: React.FC = () => {
           },
         ]}
       >
-        {/* Mobile cards */}
-        <div className="md:hidden space-y-3">
-          {items.map((t) => (
-            <div
-              key={t.id}
-              className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
-            >
-              <div className="flex items-center justify-between">
-                <Poppins className="text-sm font-semibold">{t.invoice}</Poppins>
-                <TransactionStatusBadge status={t.status} />
+        {/* Mobile cards - tampil di layar kecil */}
+        <div className="block md:hidden space-y-3">
+          {items.length > 0 ? (
+            items.map((t) => (
+              <div
+                key={t.id}
+                className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <Poppins className="text-sm font-semibold text-slate-900">
+                      {t.invoice}
+                    </Poppins>
+                    <div className="mt-1 text-xs text-slate-600">
+                      {t.customerName || t.customerEmail || "-"}
+                    </div>
+                  </div>
+                  <TransactionStatusBadge status={t.status} />
+                </div>
+                
+                <div className="text-xs text-slate-500 mb-3">
+                  {formatTime(new Date(t.createdAt), false)}
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button
+                    size="md"
+                    variant="secondary"
+                    onClick={() => navigate(`/admin/transactions/${t.invoice}`)}
+                  >
+                    Detail
+                  </Button>
+                </div>
               </div>
-              <div className="mt-1 text-xs text-slate-600">
-                {t.customerName || t.customerEmail || "-"}
-              </div>
-              <div className="mt-1 text-xs text-slate-500">
-                {formatTime(new Date(t.createdAt), false)}
-              </div>
-              <div className="mt-3 flex justify-end">
-                <Button
-                  size="md"
-                  variant="secondary"
-                  onClick={() => navigate(`/admin/transactions/${t.invoice}`)}
-                >
-                  Detail
-                </Button>
-              </div>
+            ))
+          ) : (
+            <div className="text-center text-sm text-slate-500 py-8 bg-white rounded-lg border border-slate-200">
+              Tidak ada transaksi.
             </div>
-          ))}
+          )}
         </div>
-        {/* {!items.length && (
-          <div className="text-center text-sm text-slate-500 py-6">
-            Tidak ada transaksi.
-          </div>
-        )} */}
 
-        {/* Desktop table */}
+        {/* Desktop table - tampil di layar besar */}
         <div className="hidden md:block">
           <MasterTable
             rounded={{
@@ -144,7 +151,7 @@ export const TransactionsAdmin: React.FC = () => {
               },
               {
                 return: ({ status }) => (
-                  <Poppins className="text-sm">{status}</Poppins>
+                  <TransactionStatusBadge status={status} />
                 ),
               },
               {
@@ -158,6 +165,7 @@ export const TransactionsAdmin: React.FC = () => {
                 ),
               },
             ]}
+            notFoundMessage={["Tidak ada transaksi."]}
           />
         </div>
       </CustomSection>
