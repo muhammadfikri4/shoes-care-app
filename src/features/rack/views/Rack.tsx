@@ -10,6 +10,7 @@ import { MasterTable } from "../../_global/components/MasterTable";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
 import { useRacksList } from "../hooks/useRacks";
+import { InputLabel } from "../../_global/components/InputLabel";
 
 type RackPayload = {
   code: string;
@@ -279,42 +280,48 @@ const RackForm: React.FC<{
     >
       <div className="grid grid-cols-1 gap-3">
         <div>
-          <label className="text-xs text-slate-600">Kode</label>
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Kode rak (mis: R01)"
-            value={form.code}
-            onChange={(e) => setForm((s) => ({ ...s, code: e.target.value }))}
-            required
+          <InputLabel
+            titleSize="sm"
+            gap="sm"
+            title="Kode Rak"
+            inputProps={{
+              placeholder: "Kode rak (mis: R01)",
+              value: form.code,
+              onChange: (e) => setForm((s) => ({ ...s, code: e.target.value })),
+            }}
           />
         </div>
         <div>
-          <label className="text-xs text-slate-600">Nama</label>
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Nama rak (opsional)"
-            value={form.name || ""}
-            onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
+          <InputLabel
+            titleSize="sm"
+            gap="sm"
+            title="Nama Rak"
+            inputProps={{
+              placeholder: "Nama rak (opsional)",
+              value: form.name,
+              onChange: (e) => setForm((s) => ({ ...s, name: e.target.value })),
+            }}
           />
         </div>
         <div>
-          <label className="text-xs text-slate-600">Lokasi</label>
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Lokasi rak (opsional)"
-            value={form.location || ""}
-            onChange={(e) =>
-              setForm((s) => ({ ...s, location: e.target.value }))
-            }
+          <InputLabel
+            titleSize="sm"
+            gap="sm"
+            title="Lokasi"
+            inputProps={{
+              placeholder: "Lokasi rak (opsional)",
+              value: form.location,
+              onChange: (e) =>
+                setForm((s) => ({ ...s, location: e.target.value })),
+            }}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-end gap-2 pt-2">
-        <button
+        <Button
           type="submit"
-          disabled={!canSubmit || submitting}
-          className="bg-blue-600 hover:bg-blue-700 transition text-white rounded p-2 px-4 disabled:opacity-50"
+          variant={!canSubmit || submitting ? "disabled" : "primary"}
         >
           {submitting
             ? isEdit
@@ -323,7 +330,7 @@ const RackForm: React.FC<{
             : isEdit
             ? "Simpan Perubahan"
             : "Tambah Rak"}
-        </button>
+        </Button>
       </div>
     </form>
   );

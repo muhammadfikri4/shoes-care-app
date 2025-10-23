@@ -15,13 +15,6 @@ export const TransactionsAdmin: React.FC = () => {
 
   const { data } = useTransactionsList();
   const items: TransactionModel[] = (data?.data ?? []) as TransactionModel[];
-  const tableData = items.map((t: TransactionModel) => ({
-    code: t.invoice,
-    customer: { name: t.customerName || t.customerEmail || "-" },
-    date: t.createdAt,
-    status: t.status,
-    id: t.invoice,
-  }));
 
   return (
     <BaseLayout
@@ -89,7 +82,7 @@ export const TransactionsAdmin: React.FC = () => {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <Poppins className="text-sm font-semibold text-slate-900">
-                      {t.invoice}
+                      {t.code}
                     </Poppins>
                     <div className="mt-1 text-xs text-slate-600">
                       {t.customerName || t.customerEmail || "-"}
@@ -97,16 +90,16 @@ export const TransactionsAdmin: React.FC = () => {
                   </div>
                   <TransactionStatusBadge status={t.status} />
                 </div>
-                
+
                 <div className="text-xs text-slate-500 mb-3">
                   {formatTime(new Date(t.createdAt), false)}
                 </div>
-                
+
                 <div className="flex justify-end">
                   <Button
                     size="md"
                     variant="secondary"
-                    onClick={() => navigate(`/admin/transactions/${t.invoice}`)}
+                    onClick={() => navigate(`/admin/transactions/${t.id}`)}
                   >
                     Detail
                   </Button>
@@ -129,7 +122,7 @@ export const TransactionsAdmin: React.FC = () => {
               "top-left": false,
               "top-right": false,
             }}
-            data={tableData}
+            data={items || []}
             title={["Code", "Customer", "Tanggal", "Status", "Aksi"]}
             columnTable={[
               {
@@ -138,14 +131,14 @@ export const TransactionsAdmin: React.FC = () => {
                 ),
               },
               {
-                return: ({ customer }) => (
-                  <Poppins className="text-sm">{customer?.name}</Poppins>
+                return: ({ customerName }) => (
+                  <Poppins className="text-sm">{customerName}</Poppins>
                 ),
               },
               {
-                return: ({ date }) => (
+                return: ({ createdAt }) => (
                   <Poppins className="text-sm">
-                    {formatTime(new Date(date), false)}
+                    {formatTime(new Date(createdAt), false)}
                   </Poppins>
                 ),
               },

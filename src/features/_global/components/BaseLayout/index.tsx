@@ -5,6 +5,8 @@ import { BreadCrumb } from "../BreadCrumb";
 import { BreadCrumbProps } from "../BreadCrumb/types";
 import { Poppins } from "../Text";
 import { Button, IButtonProps } from "../Button";
+import { useAtom } from "jotai";
+import { SidebarAtom } from "../../store";
 
 export type BackButtonConfig = {
   title: string; // label tombol back
@@ -32,7 +34,7 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
   action,
 }) => {
   const navigate = useNavigate();
-
+  const [open] = useAtom(SidebarAtom);
   const handleBack = () => {
     if (backButton?.onClick) return backButton.onClick();
     if (typeof backButton?.navigateTo !== "undefined") {
@@ -49,23 +51,27 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
   return (
     <div
       className={[
-        "w-full py-4 max-w-7xl mx-auto space-y-6",
+        `w-full ${open ? 'md:pl-64' : 'md:pl-16'} py-4 mx-auto space-y-6`,
         className || "",
-      ].join(" ")}
+      ].join()}
     >
       {/* Header */}
       <div className="flex md:items-center md:justify-between md:gap-0 gap-6">
         {(title || backButton || breadcrumb) && (
           <div
-            className={["mb-4 md:px-0 px-4 flex flex-col gap-2", headerClassName || ""].join(
-              " "
-            )}
+            className={[
+              "mb-4 md:px-0 px-4 flex flex-col gap-2",
+              headerClassName || "",
+            ].join(" ")}
           >
             {/* Back Button + Title */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 {backButton && (
-                  <div className="flex items-center gap-2" onClick={handleBack}>
+                  <div
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={handleBack}
+                  >
                     <ChevronLeft size={18} />
                     <span className="text-sm font-medium">
                       {backButton.title}

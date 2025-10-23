@@ -12,7 +12,7 @@ import { Input } from "../../_global/components/Input";
 import { Poppins } from "../../_global/components/Text";
 import { TextArea } from "../../_global/components/TextArea";
 import { defaultValue } from "../const";
-import { useRacksList } from "../hooks/useRacks";
+import { useRacksList } from "../../rack/hooks/useRacks";
 import { usePromoVerify, useTransactionCreate } from "../hooks/useTransactions";
 import { buildFormData } from "../utils/build-form-data";
 

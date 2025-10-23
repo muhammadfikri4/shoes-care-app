@@ -41,7 +41,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     [setInternalOpen, onOpenChange, isControlled]
   );
 
-  // === Utility: cek viewport mobile
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
@@ -136,8 +135,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        onMouseEnter={() => onOpenChange?.(true)}
-        onMouseLeave={() => onOpenChange?.(false)}
         onClick={(e) => e.stopPropagation()}
         className={[
           "bg-white shadow-lg fixed left-0 top-0 bottom-0 z-[999]",

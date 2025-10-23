@@ -21,7 +21,7 @@ export interface TransactionItemModel {
 
 export interface TransactionModel {
   id: string;
-  invoice: string;
+  code: string;
   status: TransactionStatus;
   createdAt: string;
   price: number;

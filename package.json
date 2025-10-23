@@ -32,6 +32,7 @@
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.507.0",
+    "qr-scanner": "^1.4.2",
     "react": "^18.3.1",
     "react-cropper": "^2.3.3",
     "react-day-picker": "^9.6.7",
