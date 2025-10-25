@@ -5,6 +5,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(function () {
     return {
         plugins: [react(), tsconfigPaths()],
-        envPrefix: "HIMTI_",
+        envPrefix: "DSC_",
     };
 });

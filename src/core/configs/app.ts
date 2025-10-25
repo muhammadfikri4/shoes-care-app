@@ -1,10 +1,8 @@
 export const CONFIG_APP = {
-  APP_NAME: import.meta.env.HIMTI_APP_NAME,
-  BASE_URL: import.meta.env.HIMTI_BASE_URL,
-  HIMTI_SECRET_KEY: import.meta.env.HIMTI_SECRET_KEY ?? "",
-  HIMTI_HEADER_KEY: import.meta.env.HIMTI_HEADER_KEY ?? "",
-  TOKEN_KEY: btoa(`token${import.meta.env.HIMTI_SECRET_KEY ?? ""}`),
-  REFRESH_TOKEN_KEY: btoa(`refresh${import.meta.env.HIMTI_SECRET_KEY ?? ""}`),
+  APP_NAME: import.meta.env.DSC_APP_NAME,
+  BASE_URL: import.meta.env.DSC_BASE_URL,
+  TOKEN_KEY: btoa(`token${import.meta.env.DSC_SECRET_KEY ?? ""}`),
+  REFRESH_TOKEN_KEY: btoa(`refresh${import.meta.env.DSC_SECRET_KEY ?? ""}`),
 };
 
 export const API_ENDPOINT = {
@@ -32,5 +30,5 @@ export const API_ENDPOINT = {
   authOtp: {
     request: `${CONFIG_APP.BASE_URL}/auth/customer-otp/request`,
     verify: `${CONFIG_APP.BASE_URL}/auth/customer-otp/verify`,
-  }
+  },
 };
