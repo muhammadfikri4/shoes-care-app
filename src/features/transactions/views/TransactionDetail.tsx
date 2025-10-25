@@ -1,15 +1,14 @@
+import DSC from "@core/assets/logo/DSC.svg";
 import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { BaseLayout } from "../../_global/components/BaseLayout";
 import { LoadingFallback } from "../../_global/components/Loading";
+import { formatTime } from "../../_global/lib/format-time";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 import { TransactionTimeline } from "../components/TransactionTimeline";
 import { useDetailTransaction } from "../hooks/useTransactions";
-import { formatDate } from "../../_global/lib/format-time";
-import DSC from "@core/assets/logo/DSC.svg";
 
 export const TransactionDetail: React.FC = () => {
   const { data: transaction, isFetching, error } = useDetailTransaction();
-  const navigate = useNavigate();
 
   const format = useMemo(
     () =>
@@ -29,107 +28,104 @@ export const TransactionDetail: React.FC = () => {
   const items = transaction?.data?.items ?? [];
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-start sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold">
-            Detail Transaksi
-          </h1>
-          <div className="text-slate-500 text-xs sm:text-sm break-all">
-            #{transaction?.data?.code}
-          </div>
-        </div>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-blue-600 hover:underline text-sm"
-          aria-label="Kembali"
-        >
-          Kembali
-        </button>
-      </div>
+    <BaseLayout
+      title={`Detail Transaksi #${transaction?.data?.code}`}
+      backButton={{
+        title: "Kembali",
+      }}
+    >
+      <div className="flex flex-col gap-4">
+        {/* Header */}
+        <div className="flex items-start sm:items-center justify-between gap-3"></div>
 
-      {/* Info ringkas */}
-      <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <InfoItem
-            label="Nama"
-            value={transaction?.data?.customerName || "-"}
-          />
-          <InfoItem
-            label="Email"
-            value={transaction?.data?.customerEmail || "-"}
-          />
-          <InfoItem label="No Telepon" value={"-"} />
-          <InfoItem
-            label="Tanggal Transaksi"
-            value={
-              transaction?.data?.createdAt
-                ? formatDate(transaction?.data?.createdAt)
-                : "-"
-            }
-          />
-          <InfoItem
-            label="Kode Transaksi"
-            value={transaction?.data?.code || "-"}
-          />
-          <div>
-            <div className="text-slate-500 text-xs sm:text-sm">Status</div>
-            <div className="mt-0.5">
-              <TransactionStatusBadge
-                status={transaction?.data?.status || ""}
-              />
+        {/* Info ringkas */}
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <InfoItem
+              label="Nama"
+              value={transaction?.data?.customer?.name || "-"}
+            />
+            <InfoItem
+              label="Email"
+              value={transaction?.data?.customer?.email || "-"}
+            />
+            <InfoItem
+              label="No Telepon"
+              value={transaction?.data?.customer?.phone || "-"}
+            />
+            <InfoItem
+              label="Tanggal Transaksi"
+              value={
+                transaction?.data?.createdAt
+                  ? formatTime(transaction?.data?.createdAt)
+                  : "-"
+              }
+            />
+            <InfoItem
+              label="Kode Transaksi"
+              value={transaction?.data?.code || "-"}
+            />
+            <div>
+              <div className="text-slate-500 text-xs sm:text-sm">Status</div>
+              <div className="mt-0.5">
+                <TransactionStatusBadge
+                  status={transaction?.data?.status || ""}
+                />
+              </div>
+            </div>
+            <InfoItem
+              label="Metode Pembayaran"
+              value={transaction?.data?.paymentMethod || "-"}
+            />
+            <div>
+              <div className="text-slate-500 text-xs sm:text-sm">
+                Total Harga
+              </div>
+              <div className="font-semibold mt-0.5">
+                {format.format(
+                  Number(
+                    transaction?.data?.finalPrice || transaction?.data?.price
+                  ) || 0
+                )}
+              </div>
             </div>
           </div>
-          <InfoItem label="Metode Pembayaran" value={"-"} />
-          <div>
-            <div className="text-slate-500 text-xs sm:text-sm">Total Harga</div>
-            <div className="font-semibold mt-0.5">
-              {format.format(
-                Number(
-                  transaction?.data?.finalPrice || transaction?.data?.price
-                ) || 0
-              )}
+        </div>
+
+        {/* Timeline */}
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
+          <div className="font-semibold mb-3">Timeline</div>
+          <TransactionTimeline
+            status={transaction?.data?.status || "IN_PROGRESS"}
+          />
+        </div>
+
+        {/* Items */}
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
+          <div className="font-semibold mb-3">Items</div>
+
+          {items.length === 0 ? (
+            <div className="text-sm text-slate-500">Belum ada item.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {items.map((it) => (
+                <ItemCard
+                  estimateDay={it.estimateDay}
+                  key={it.id}
+                  name={it.name}
+                  rackCode={it.rackCode}
+                  price={it.price}
+                  imgSrc={it.photoUrl}
+                  currencyFormatter={format}
+                />
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
-
-      {/* Timeline */}
-      <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-        <div className="font-semibold mb-3">Timeline</div>
-        <TransactionTimeline
-          status={transaction?.data?.status || "IN_PROGRESS"}
-        />
-      </div>
-
-      {/* Items */}
-      <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-        <div className="font-semibold mb-3">Items</div>
-
-        {items.length === 0 ? (
-          <div className="text-sm text-slate-500">Belum ada item.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {items.map((it) => (
-              <ItemCard
-                estimateDay={it.estimateDay}
-                key={it.id}
-                name={it.name}
-                rackCode={it.rackCode}
-                price={it.price}
-                imgSrc={it.photoUrl}
-                currencyFormatter={format}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    </BaseLayout>
   );
 };
-
-/* ----------------- Subcomponents ----------------- */
 
 const InfoItem: React.FC<{ label: string; value: React.ReactNode }> = ({
   label,

@@ -82,7 +82,7 @@ export const TransactionCreate: React.FC = () => {
         navigateTo: "/admin/transactions",
       }}
     >
-      <div className="max-w-6xl mx-auto pb-24">
+      <div className="pb-24">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
           <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
             <div>

@@ -13,7 +13,7 @@ import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 export const TransactionsAdmin: React.FC = () => {
   const navigate = useNavigate();
 
-  const { data } = useTransactionsList();
+  const { data, isFetching } = useTransactionsList();
   const items: TransactionModel[] = (data?.data ?? []) as TransactionModel[];
 
   return (
@@ -116,6 +116,7 @@ export const TransactionsAdmin: React.FC = () => {
         {/* Desktop table - tampil di layar besar */}
         <div className="hidden md:block">
           <MasterTable
+            isLoading={isFetching}
             rounded={{
               "bottom-left": false,
               "bottom-right": false,

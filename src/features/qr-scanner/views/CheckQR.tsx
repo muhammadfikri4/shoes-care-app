@@ -96,7 +96,7 @@ export const CheckQR: React.FC = () => {
       {mode === "scan" && (
         <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="w-96">
+            <div className="w-full sm:w-96">
               {" "}
               <DropdownRevamp
                 placeholder="Pilih kamera"
@@ -137,7 +137,7 @@ export const CheckQR: React.FC = () => {
 
           {camError && <div className="text-red-600 text-sm">{camError}</div>}
 
-          <div className="aspect-video w-full bg-slate-100 rounded-lg overflow-hidden border">
+          <div className="relative w-full h-[65vh] sm:h-[60vh] bg-black rounded-xl overflow-hidden border">
             {/* Mirror diatur oleh hook lewat style.transform */}
             <video
               ref={videoRef}
@@ -145,6 +145,25 @@ export const CheckQR: React.FC = () => {
               muted
               playsInline
             />
+
+            {/* Focus overlay: kotak kecil di tengah */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="relative w-40 h-40 sm:w-56 sm:h-56">
+                {/* Darken area outside box using a big shadow trick */}
+                <div className="absolute inset-0 rounded-xl shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+                {/* Box */}
+                <div className="absolute inset-0 rounded-xl border-2 border-emerald-400 animate-pulse" />
+                {/* Corner accents */}
+                <span className="absolute -top-1 left-2 h-6 w-0.5 bg-emerald-400" />
+                <span className="absolute -top-1 right-2 h-6 w-0.5 bg-emerald-400" />
+                <span className="absolute -bottom-1 left-2 h-6 w-0.5 bg-emerald-400" />
+                <span className="absolute -bottom-1 right-2 h-6 w-0.5 bg-emerald-400" />
+                <span className="absolute left-1 -top-2 w-6 h-0.5 bg-emerald-400" />
+                <span className="absolute right-1 -top-2 w-6 h-0.5 bg-emerald-400" />
+                <span className="absolute left-1 -bottom-2 w-6 h-0.5 bg-emerald-400" />
+                <span className="absolute right-1 -bottom-2 w-6 h-0.5 bg-emerald-400" />
+              </div>
+            </div>
           </div>
 
           {!!input && (

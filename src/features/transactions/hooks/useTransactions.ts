@@ -52,11 +52,11 @@ export const useTransactionCreate = () => {
     onError: (err) => toast.error(err.message),
     onSuccess: (res) => {
       toast.success(res.message);
+      navigate("/admin/transactions");
       if (res?.data?.midtransRedirectUrl) {
         window.open(res?.data?.midtransRedirectUrl, "_blank");
         return;
       }
-      navigate("/admin/transactions");
     },
   });
 };

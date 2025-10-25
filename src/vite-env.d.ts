@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly HIMTI_APP_NAME: string;
-  readonly HIMTI_BASE_URL: string;
+  readonly DSC_APP_NAME: string;
+  readonly DSC_BASE_URL: string;
 }
 
 interface ImportMeta {

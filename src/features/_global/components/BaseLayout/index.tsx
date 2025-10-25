@@ -1,6 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 import React, { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router-dom";
 import { BreadCrumb } from "../BreadCrumb";
 import { BreadCrumbProps } from "../BreadCrumb/types";
 import { Poppins } from "../Text";
@@ -9,9 +9,9 @@ import { useAtom } from "jotai";
 import { SidebarAtom } from "../../store";
 
 export type BackButtonConfig = {
-  title: string; // label tombol back
-  navigateTo?: string | number; // string path atau number seperti -1
-  onClick?: () => void; // override handler
+  title: string;
+  navigateTo?: To;
+  onClick?: () => void;
 };
 
 export interface PageLayoutProps {
