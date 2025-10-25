@@ -1,4 +1,4 @@
-import { TransactionModel } from "@core/model/transaction";
+import { TRANSACTION_STATUS, TransactionModel } from "@core/model/transaction";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
@@ -60,7 +60,7 @@ export const TransactionsAdmin: React.FC = () => {
                 },
                 {
                   label: "Ready to Pick Up",
-                  value: "READY_FOR_PICKUP",
+                  value: TRANSACTION_STATUS.READY_TO_PICKUP,
                 },
                 {
                   label: "Completed",

@@ -5,10 +5,18 @@ import { LoadingFallback } from "../../_global/components/Loading";
 import { formatTime } from "../../_global/lib/format-time";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 import { TransactionTimeline } from "../components/TransactionTimeline";
-import { useDetailTransaction } from "../hooks/useTransactions";
+import {
+  useDetailTransaction,
+  useMarkCompleted,
+  useMarkReadyToPickup,
+} from "../hooks/useTransactions";
+import { Button } from "../../_global/components/Button";
+import { TRANSACTION_STATUS } from "../../../core/model/transaction";
 
 export const TransactionDetail: React.FC = () => {
   const { data: transaction, isFetching, error } = useDetailTransaction();
+  const markReady = useMarkReadyToPickup();
+  const markDone = useMarkCompleted();
 
   const format = useMemo(
     () =>
@@ -33,11 +41,35 @@ export const TransactionDetail: React.FC = () => {
       backButton={{
         title: "Kembali",
       }}
+      actionType="node"
+      action={
+        <>
+          {transaction?.data?.status === "IN_PROGRESS" && (
+            <Button
+              variant={markReady.isPending ? "disabled" : "primary"}
+              onClick={() =>
+                transaction?.data?.id &&
+                markReady.mutate({ id: transaction.data.id })
+              }
+            >
+              {markReady.isPending ? "Loading..." : "Ready To Pick Up"}
+            </Button>
+          )}
+          {transaction?.data?.status === TRANSACTION_STATUS.READY_TO_PICKUP && (
+            <Button
+              variant={markDone.isPending ? "disabled" : "success"}
+              onClick={() =>
+                transaction?.data?.id &&
+                markDone.mutate({ id: transaction.data.id })
+              }
+            >
+              {markDone.isPending ? "Loading..." : "Completed"}
+            </Button>
+          )}
+        </>
+      }
     >
       <div className="flex flex-col gap-4">
-        {/* Header */}
-        <div className="flex items-start sm:items-center justify-between gap-3"></div>
-
         {/* Info ringkas */}
         <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-100 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -69,7 +101,7 @@ export const TransactionDetail: React.FC = () => {
               <div className="text-slate-500 text-xs sm:text-sm">Status</div>
               <div className="mt-0.5">
                 <TransactionStatusBadge
-                  status={transaction?.data?.status || ""}
+                  status={transaction?.data?.status || TRANSACTION_STATUS.CREATED}
                 />
               </div>
             </div>

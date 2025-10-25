@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { transactionsService } from "@core/services/pos";
 import { Badge } from "@features/_global/components/Badge";
-import { TransactionModel } from "@core/model/transaction";
+import { TRANSACTION_STATUS, TransactionModel } from "@core/model/transaction";
 
 export const TransactionsCustomer: React.FC = () => {
   const [items, setItems] = useState<TransactionModel[]>([]);
@@ -39,9 +39,9 @@ export const TransactionsCustomer: React.FC = () => {
               <div className="font-semibold">{t.code}</div>
               <Badge
                 variant={
-                  t.status === "PICKED_UP"
+                  t.status === TRANSACTION_STATUS.COMPLETED
                     ? "success"
-                    : t.status === "CREATED"
+                    : t.status === TRANSACTION_STATUS.CREATED
                     ? "warning"
                     : "secondary"
                 }

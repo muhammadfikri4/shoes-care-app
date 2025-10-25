@@ -3,10 +3,18 @@ export type PaymentMethod = "QRIS" | "CASH";
 export type TransactionStatus =
   | "CREATED"
   | "IN_PROGRESS"
-  | "READY_FOR_PICKUP"
-  | "PICKED_UP"
+  | "READY_TO_PICKUP"
+  | "COMPLETED"
   | "CANCELLED";
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
+
+export enum TRANSACTION_STATUS {
+  CREATED = "CREATED",
+  IN_PROGRESS = "IN_PROGRESS",
+  READY_TO_PICKUP = "READY_TO_PICKUP",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+}
 
 export interface TransactionItemModel {
   id: string;

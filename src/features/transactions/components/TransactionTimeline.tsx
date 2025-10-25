@@ -1,18 +1,16 @@
 import React from "react";
+import {
+  TRANSACTION_STATUS,
+  TransactionStatus,
+} from "../../../core/model/transaction";
 
-type Step =
-  | "CREATED"
-  | "IN_PROGRESS"
-  | "READY_FOR_PICKUP"
-  | "PICKED_UP"
-  | "CANCELLED";
-
-const steps: { key: Exclude<Step, "CANCELLED">; label: string }[] = [
-  { key: "CREATED", label: "Pending" },
-  { key: "IN_PROGRESS", label: "On Process" },
-  { key: "READY_FOR_PICKUP", label: "Ready to Pick Up" },
-  { key: "PICKED_UP", label: "Completed" },
-];
+const steps: { key: Exclude<TransactionStatus, "CANCELLED">; label: string }[] =
+  [
+    { key: TRANSACTION_STATUS.CREATED, label: "Pending" },
+    { key: TRANSACTION_STATUS.IN_PROGRESS, label: "On Process" },
+    { key: TRANSACTION_STATUS.READY_TO_PICKUP, label: "Ready to Pick Up" },
+    { key: "COMPLETED", label: "Completed" },
+  ];
 
 const colorClassIdx = (
   index: number,
@@ -28,7 +26,9 @@ const colorClassIdx = (
     : "bg-slate-200";
 };
 
-export const TransactionTimeline: React.FC<{ status: Step }> = ({ status }) => {
+export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
+  status,
+}) => {
   const isCancelled = status === "CANCELLED";
   const currentIndex = steps.findIndex((s) => s.key === status);
   // default ke step 0 bila status tidak ditemukan; jika CANCELLED kita tetap tandai node merah di step 0
@@ -83,10 +83,12 @@ export const TransactionTimeline: React.FC<{ status: Step }> = ({ status }) => {
                   )}
                 </div>
                 <p className="text-xs text-slate-500">
-                  {s.key === "CREATED" && "Transaksi dibuat"}
-                  {s.key === "IN_PROGRESS" && "Sedang diproses"}
-                  {s.key === "READY_FOR_PICKUP" && "Siap diambil"}
-                  {s.key === "PICKED_UP" && "Selesai"}
+                  {s.key === TRANSACTION_STATUS.CREATED && "Transaksi dibuat"}
+                  {s.key === TRANSACTION_STATUS.IN_PROGRESS &&
+                    "Sedang diproses"}
+                  {s.key === TRANSACTION_STATUS.READY_TO_PICKUP &&
+                    "Siap diambil"}
+                  {s.key === TRANSACTION_STATUS.COMPLETED && "Selesai"}
                 </p>
               </div>
             </li>
@@ -106,7 +108,7 @@ export const TransactionTimeline: React.FC<{ status: Step }> = ({ status }) => {
             : active
             ? "bg-primary border-blue-600 text-white"
             : done
-            ? "bg-white border-blue-600 text-blue-600"
+            ? "bg-success border-green-600 text-white"
             : "bg-white border-slate-300 text-slate-400";
 
           const connectorClass = colorClassIdx(i, idx, isCancelled);
@@ -132,10 +134,12 @@ export const TransactionTimeline: React.FC<{ status: Step }> = ({ status }) => {
                 </div>
 
                 <div className="mt-0.5 text-xs text-slate-500 line-clamp-2">
-                  {s.key === "CREATED" && "Transaksi dibuat"}
-                  {s.key === "IN_PROGRESS" && "Sedang diproses"}
-                  {s.key === "READY_FOR_PICKUP" && "Siap diambil"}
-                  {s.key === "PICKED_UP" && "Selesai"}
+                  {s.key === TRANSACTION_STATUS.CREATED && "Transaksi dibuat"}
+                  {s.key === TRANSACTION_STATUS.IN_PROGRESS &&
+                    "Sedang diproses"}
+                  {s.key === TRANSACTION_STATUS.READY_TO_PICKUP &&
+                    "Siap diambil"}
+                  {s.key === TRANSACTION_STATUS.COMPLETED && "Selesai"}
                   {cancelledHere && " — Dibatalkan"}
                 </div>
               </div>

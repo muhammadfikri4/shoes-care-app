@@ -48,6 +48,12 @@ export const transactionsService = {
   verifyPromo: request.post<ApiResponse<PromoVerifyResponse>>(
     `${API_ENDPOINT.pos.transactions}/promo/verify`
   ),
+  markReadyToPickup: request.post<ApiResponse<OkResponse>, { id: string }>(
+    `${API_ENDPOINT.pos.transactions}/ready-to-pickup`
+  ),
+  markCompleted: request.post<ApiResponse<OkResponse>, { id: string }>(
+    `${API_ENDPOINT.pos.transactions}/complete`
+  ),
 };
 
 // OTP Auth

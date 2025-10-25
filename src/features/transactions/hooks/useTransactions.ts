@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { transactionsService } from "@core/services/pos";
 import { PromoVerifyRequest } from "@core/model/transaction";
 import { QueryParams } from "../../../core/libs/api/types";
@@ -96,5 +96,39 @@ export const useDetailTransaction = () => {
         path: transactionId,
       }),
     enabled: !!transactionId,
+  });
+};
+
+export const useMarkReadyToPickup = () => {
+  const qc = useQueryClient();
+  const { transactionId } = useParams();
+  return useMutation({
+    mutationKey: ["transaction-ready", { transactionId }],
+    mutationFn: (payload: { id: string }) =>
+      transactionsService.markReadyToPickup(payload),
+    onSuccess: async (res) => {
+      toast.success(res.message);
+      await qc.invalidateQueries({
+        queryKey: ["transaction-detail", { transactionId }],
+      });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+};
+
+export const useMarkCompleted = () => {
+  const qc = useQueryClient();
+  const { transactionId } = useParams();
+  return useMutation({
+    mutationKey: ["transaction-complete", { transactionId }],
+    mutationFn: (payload: { id: string }) =>
+      transactionsService.markCompleted(payload),
+    onSuccess: async (res) => {
+      toast.success(res.message);
+      await qc.invalidateQueries({
+        queryKey: ["transaction-detail", { transactionId }],
+      });
+    },
+    onError: (err) => toast.error(err.message),
   });
 };
