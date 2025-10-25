@@ -13,6 +13,7 @@ export const buildFormData = (data: TransactionCreationDTO) => {
     formData.append(`items[${i}][name]`, it.name);
     formData.append(`items[${i}][price]`, String(it.price));
     formData.append(`items[${i}][estimateDay]`, String(it.estimateDay));
+    if (it.rack?.id) formData.append(`items[${i}][rackId]`, it.rack.id);
     if (it.note) formData.append(`items[${i}][note]`, it.note);
     if (it.file) formData.append(`items[${i}][file]`, it.file);
   });

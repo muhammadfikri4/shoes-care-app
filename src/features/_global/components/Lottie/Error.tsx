@@ -1,18 +1,18 @@
 import Lottie from "lottie-react";
-import NotFoundJSON from "../../../../core/assets/lottie/no-data.json";
+import ErrorJSON from "../../../../core/assets/lottie/error.json";
 import { Button } from "../Button";
 import { useNavigate } from "react-router-dom";
 
-interface NotFoundProps {
+interface ErrorProps {
   withBackButton?: boolean;
 }
 
-export const NotFound: React.FC<NotFoundProps> = ({ withBackButton }) => {
+export const Error: React.FC<ErrorProps> = ({ withBackButton }) => {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center gap-16 w-screen h-screen">
       <Lottie
-        animationData={NotFoundJSON}
+        animationData={ErrorJSON}
         loop={true}
         style={{
           width: "50rem",

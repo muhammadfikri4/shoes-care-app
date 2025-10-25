@@ -1,18 +1,18 @@
 import { createBrowserRouter } from "react-router-dom";
 import { NotFound } from "../../features/_global/components/NotFound";
 
+import { RootLayout } from "../../features/_global/views/Root";
+import { CustomerOtpLogin } from "../../features/auth/views/CustomerOtpLogin";
 import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
 import { ProfileViews } from "../../features/profile/views/ProfileViews";
-import { FriendsViews } from "../../features/friends/views/FriendsViews";
-import { RacksManagement } from "../../features/rack/views/Rack";
-import { TransactionsAdmin } from "../../features/transactions/views/TransactionsAdmin";
-import { TransactionCreate } from "../../features/transactions/views/TransactionCreate";
-import { TransactionsCustomer } from "../../features/transactions/views/TransactionsCustomer";
 import { CheckQR } from "../../features/qr-scanner/views/CheckQR";
+import { RacksManagement } from "../../features/rack/views/Rack";
+import { TransactionCreate } from "../../features/transactions/views/TransactionCreate";
 import { TransactionDetail } from "../../features/transactions/views/TransactionDetail";
-import { CustomerOtpLogin } from "../../features/auth/views/CustomerOtpLogin";
-import { RootLayout } from "../../features/_global/views/Root";
+import { TransactionsAdmin } from "../../features/transactions/views/TransactionsAdmin";
+import { TransactionsCustomer } from "../../features/transactions/views/TransactionsCustomer";
+import { Protected } from "../../features/_global/views/Protected";
 
 export const router = createBrowserRouter([
   {
@@ -20,12 +20,12 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: "/profile",
-        element: <ProfileViews />,
+        path: "/",
+        element: <Protected />,
       },
       {
-        path: "/friends",
-        element: <FriendsViews />,
+        path: "/profile",
+        element: <ProfileViews />,
       },
       {
         path: "/admin/racks",
@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
         element: <TransactionCreate />,
       },
       {
-        path: "/admin/transactions/:invoice",
+        path: "/admin/transactions/:transactionId",
         element: <TransactionDetail />,
       },
       {
@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
         element: <TransactionsCustomer />,
       },
       {
-        path: "/my/transactions/:invoice",
+        path: "/my/transactions/:transactionId",
         element: <TransactionDetail />,
       },
       {

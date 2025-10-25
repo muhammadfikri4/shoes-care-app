@@ -39,15 +39,12 @@ export const transactionsService = {
   scan: request.post<ApiResponse<OkResponse>, { qr: string }>(
     API_ENDPOINT.pos.transactionsScan
   ),
-  lookup: (query: { qr?: string; invoice?: string }) =>
-    request.get<ApiResponse<TransactionLookupModel>>(
-      API_ENDPOINT.pos.transactionsLookup
-    )({
-      queryParams: {
-        ...(query.qr && { qr: query.qr }),
-        ...(query.invoice && { invoice: query.invoice }),
-      },
-    }),
+  lookup: request.get<ApiResponse<TransactionLookupModel>>(
+    API_ENDPOINT.pos.transactionsLookup
+  ),
+  getById: request.get<ApiResponse<TransactionLookupModel>>(
+    API_ENDPOINT.pos.transactions
+  ),
   verifyPromo: request.post<ApiResponse<PromoVerifyResponse>>(
     `${API_ENDPOINT.pos.transactions}/promo/verify`
   ),

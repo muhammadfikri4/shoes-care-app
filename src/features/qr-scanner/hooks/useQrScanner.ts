@@ -37,7 +37,7 @@ export function useQrScanner(onResult: QrResultHandler) {
       if (!videoRef.current) return;
 
       // dispose lama
-      await stop();
+      stop();
       scannerRef.current?.destroy();
       scannerRef.current = null;
 
@@ -55,7 +55,7 @@ export function useQrScanner(onResult: QrResultHandler) {
           onDecodeError: () => {},
           maxScansPerSecond: 8,
           preferredCamera: deviceId ?? prefFacing, // QrScanner mendukung 'user' / 'environment'
-          highlightScanRegion: true,
+          highlightScanRegion: false,
           highlightCodeOutline: true,
         }
       );

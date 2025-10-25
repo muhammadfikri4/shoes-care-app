@@ -1,14 +1,12 @@
-import { TransactionLookupModel } from "@core/model/transaction";
-import { transactionsService } from "@core/services/pos";
-import { Badge } from "@features/_global/components/Badge";
-import React, { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp";
+import { useLookupTransaction } from "../../transactions/hooks/useTransactions";
+import { HeaderQRCheck } from "../components/HeaderQRCheck";
 import { ManualQRCheck } from "../components/ManualQRCheck";
 import { useQrScanner } from "../hooks/useQrScanner";
-import { HeaderQRCheck } from "../components/HeaderQRCheck";
 
 type Mode = "manual" | "scan";
 
@@ -17,16 +15,11 @@ export const CheckQR: React.FC = () => {
   const [input, setInput] = useState<string>(
     searchParams.get("invoice") || searchParams.get("qr") || ""
   );
-  const [data, setData] = useState<TransactionLookupModel | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("manual");
-
-  const format = useMemo(
-    () =>
-      new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }),
-    []
-  );
+  const mutation = useLookupTransaction();
+  const navigate = useNavigate();
 
   const runLookup = async (q?: string) => {
     const raw = (q ?? input)?.trim();
@@ -35,14 +28,14 @@ export const CheckQR: React.FC = () => {
     setError(null);
     try {
       const isQr = raw.includes(":"); // contoh: sc-pos:tx:INV-...
-      const res = await transactionsService.lookup(
-        isQr ? { qr: raw } : { invoice: raw }
+      console.log({ isQr, raw });
+      const res = await mutation.mutateAsync(
+        isQr ? { qr: raw, code: "" } : { code: raw, qr: "" }
       );
-      setData(res?.data as TransactionLookupModel);
+      navigate(`/my/transactions/${res?.data?.id}`);
       setSearchParams(isQr ? { qr: raw } : { invoice: raw }, { replace: true });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Lookup gagal");
-      setData(null);
     } finally {
       setLoading(false);
     }
@@ -164,7 +157,7 @@ export const CheckQR: React.FC = () => {
       )}
 
       {/* Hasil pencarian */}
-      {data && (
+      {/* {data && (
         <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div className="text-xl font-semibold">{data.invoice}</div>
@@ -250,7 +243,7 @@ export const CheckQR: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </BaseLayout>
   );
 };

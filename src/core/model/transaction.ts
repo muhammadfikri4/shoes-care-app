@@ -12,11 +12,11 @@ export interface TransactionItemModel {
   id: string;
   name: string;
   qty: number;
-  unitPrice: number;
-  lineTotal: number;
+  price: number
   estimateDay?: number | null;
   photoUrl?: string | null;
   note?: string | null;
+  rackCode?: string | null;
 }
 
 export interface TransactionModel {
@@ -76,7 +76,7 @@ export interface TransactionHistoryItem {
 
 export interface TransactionLookupModel {
   id: string;
-  invoice: string;
+  code: string;
   status: TransactionStatus;
   rack: { id: string; code: string; name?: string | null } | null;
   price: number;
@@ -84,8 +84,8 @@ export interface TransactionLookupModel {
   promoApplied: boolean;
   customerName?: string | null;
   customerEmail?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   items: TransactionItemModel[];
   history: TransactionHistoryItem[];
 }

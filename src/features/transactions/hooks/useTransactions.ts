@@ -6,12 +6,14 @@ import { BaseValue } from "../../_global/components/SmartFilter";
 import { useQueryParamsFilter } from "../../_global/hooks/useQueryParamsFilter";
 import useDebounce from "../../_global/hooks/useDebounce";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface TransactionQueryParams extends QueryParams {
   minPrice?: BaseValue;
   maxPrice?: BaseValue;
   status?: BaseValue;
+  code?: string;
+  qr?: string;
 }
 
 export const useTransactionsList = () => {
@@ -66,5 +68,33 @@ export const usePromoVerify = () => {
       transactionsService.verifyPromo(body),
     onError: (err) => toast.error(err.message),
     onSuccess: (res) => toast.success(res.message),
+  });
+};
+
+export const useLookupTransaction = () => {
+  return useMutation({
+    mutationFn: (data: Required<Pick<TransactionQueryParams, "code" | "qr">>) =>
+      transactionsService.lookup({
+        queryParams: {
+          ...(data?.code && {
+            code: data.code,
+          }),
+          ...(data?.qr && {
+            qr: data.qr,
+          }),
+        },
+      }),
+  });
+};
+
+export const useDetailTransaction = () => {
+  const { transactionId } = useParams();
+  return useQuery({
+    queryKey: ["transaction-detail", { transactionId }],
+    queryFn: () =>
+      transactionsService.getById({
+        path: transactionId,
+      }),
+    enabled: !!transactionId,
   });
 };
