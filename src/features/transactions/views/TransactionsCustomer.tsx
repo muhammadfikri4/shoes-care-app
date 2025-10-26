@@ -1,86 +1,110 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { transactionsService } from "@core/services/pos";
-import { Badge } from "@features/_global/components/Badge";
-import { TRANSACTION_STATUS, TransactionModel } from "@core/model/transaction";
+import { BaseLayout } from "../../_global/components/BaseLayout";
+import { Button } from "../../_global/components/Button";
+import { MasterTable } from "../../_global/components/MasterTable";
+import { Poppins } from "../../_global/components/Text";
+import { formatTime } from "../../_global/lib/format-time";
+import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
+import { useMyTransactionsList } from "../hooks/useTransactions";
+import { TransactionModel } from "@core/model/transaction";
+import { CustomSection } from "../../_global/components/SmartFilter";
 
 export const TransactionsCustomer: React.FC = () => {
-  const [items, setItems] = useState<TransactionModel[]>([]);
-  const load = async () => {
-    const res = await transactionsService.listMine();
-    setItems(res?.data ?? []);
-  };
-  useEffect(() => {
-    load();
-  }, []);
-
-  const format = useMemo(
-    () =>
-      new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }),
-    []
-  );
   const navigate = useNavigate();
+  const { data, isFetching } = useMyTransactionsList();
+  const items: TransactionModel[] = (data?.data ?? []) as TransactionModel[];
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Riwayat Transaksi</h1>
-        <p className="text-slate-500 text-sm">
-          Terima kasih telah menggunakan layanan ShoesCare.
-        </p>
-      </div>
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-        {items.map((t) => (
-          <div
-            key={t.id}
-            className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"
-          >
-            <div className="flex items-center justify-between">
-              <div className="font-semibold">{t.code}</div>
-              <Badge
-                variant={
-                  t.status === TRANSACTION_STATUS.COMPLETED
-                    ? "success"
-                    : t.status === TRANSACTION_STATUS.CREATED
-                    ? "warning"
-                    : "secondary"
-                }
-                size="sm"
+    <BaseLayout title="Riwayat Transaksi">
+      <CustomSection>
+        {/* Mobile cards */}
+        <div className="block md:hidden space-y-3">
+          {items.length > 0 ? (
+            items.map((t) => (
+              <div
+                key={t.id}
+                className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 hover:shadow-md transition-shadow"
               >
-                {t.status}
-              </Badge>
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <Poppins className="text-sm font-semibold text-slate-900">
+                      {t.code}
+                    </Poppins>
+                    <div className="mt-1 text-xs text-slate-600">
+                      {t.customerName || t.customerEmail || "-"}
+                    </div>
+                  </div>
+                  <TransactionStatusBadge status={t.status} />
+                </div>
+
+                <div className="text-xs text-slate-500 mb-3">
+                  {formatTime(new Date(t.createdAt), false)}
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    size="md"
+                    variant="secondary"
+                    onClick={() => navigate(`/my/transactions/${t.id}`)}
+                  >
+                    Detail
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-sm text-slate-500 py-8 bg-white rounded-lg border border-slate-200">
+              Tidak ada transaksi.
             </div>
-            <div className="mt-2 text-sm text-slate-600">
-              Rak: <span className="font-medium">{t.rack?.code}</span>
-            </div>
-            <div className="mt-1 text-sm text-slate-600">
-              Harga: {format.format(t.price)}
-            </div>
-            <div className="mt-1 text-sm">
-              Final:{" "}
-              <span className="font-semibold">
-                {format.format(t.finalPrice)}
-              </span>{" "}
-              {t.promoApplied && (
-                <Badge variant="success" size="sm" className="ml-2">
-                  Promo 10x
-                </Badge>
-              )}
-            </div>
-            <div className="mt-1 text-xs text-slate-500">
-              {new Date(t.createdAt).toLocaleString()}
-            </div>
-            <div className="mt-3 flex justify-end">
-              <button
-                onClick={() => navigate(`/my/transactions/${t.code}`)}
-                className="text-blue-600 hover:underline text-sm"
-              >
-                Detail & Tracking
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block">
+          <MasterTable
+            isLoading={isFetching}
+            rounded={{
+              "bottom-left": false,
+              "bottom-right": false,
+              "top-left": false,
+              "top-right": false,
+            }}
+            data={items || []}
+            title={["Code", "Tanggal", "Status", "Aksi"]}
+            columnTable={[
+              {
+                return: ({ code }) => (
+                  <Poppins className="text-sm">{code}</Poppins>
+                ),
+              },
+              {
+                return: ({ createdAt }) => (
+                  <Poppins className="text-sm">
+                    {formatTime(new Date(createdAt), false)}
+                  </Poppins>
+                ),
+              },
+              {
+                return: ({ status }) => (
+                  <TransactionStatusBadge status={status} />
+                ),
+              },
+              {
+                return: ({ id }) => (
+                  <Button
+                    variant="secondary"
+                    onClick={() => navigate(`/my/transactions/${id}`)}
+                  >
+                    Detail
+                  </Button>
+                ),
+              },
+            ]}
+            notFoundMessage={["Tidak ada transaksi."]}
+          />
+        </div>
+      </CustomSection>
+    </BaseLayout>
   );
 };

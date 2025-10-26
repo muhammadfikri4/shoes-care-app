@@ -7,6 +7,7 @@ import { useLookupTransaction } from "../../transactions/hooks/useTransactions";
 import { HeaderQRCheck } from "../components/HeaderQRCheck";
 import { ManualQRCheck } from "../components/ManualQRCheck";
 import { useQrScanner } from "../hooks/useQrScanner";
+import { ApiResponse } from "../../../core/libs/api/types";
 
 type Mode = "manual" | "scan";
 
@@ -35,7 +36,17 @@ export const CheckQR: React.FC = () => {
       navigate(`/my/transactions/${res?.data?.id}`);
       setSearchParams(isQr ? { qr: raw } : { invoice: raw }, { replace: true });
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Lookup gagal");
+      const err = e as ApiResponse;
+      const msg = err?.message || "Lookup gagal";
+      setError(msg);
+      // Redirect to customer login with returnUrl if unauthorized
+      if (err?.status === 401 || err?.code === "UNAUTHORIZED") {
+        const returnUrl = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/login?role=CUSTOMER&returnUrl=${encodeURIComponent(
+          returnUrl
+        )}`;
+        return;
+      }
     } finally {
       setLoading(false);
     }

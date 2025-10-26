@@ -55,13 +55,3 @@ export const transactionsService = {
     `${API_ENDPOINT.pos.transactions}/complete`
   ),
 };
-
-// OTP Auth
-export const otpAuthService = {
-  request: request.post<ApiResponse<unknown>, { email: string; name?: string }>(
-    API_ENDPOINT.authOtp.request
-  ),
-  verify: request.post<ApiResponse<unknown>, { email: string; otp: string }>(
-    API_ENDPOINT.authOtp.verify
-  ),
-};

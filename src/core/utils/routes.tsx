@@ -2,9 +2,10 @@ import { createBrowserRouter } from "react-router-dom";
 import { NotFound } from "../../features/_global/components/NotFound";
 
 import { RootLayout } from "../../features/_global/views/Root";
-import { CustomerOtpLogin } from "../../features/auth/views/CustomerOtpLogin";
 import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
+import { CustomerRegister } from "../../features/auth/views/CustomerRegister";
+import { CustomerRegisterVerify } from "../../features/auth/views/CustomerRegisterVerify";
 import { ProfileViews } from "../../features/profile/views/ProfileViews";
 import { CheckQR } from "../../features/qr-scanner/views/CheckQR";
 import { RacksManagement } from "../../features/rack/views/Rack";
@@ -67,7 +68,15 @@ export const router = createBrowserRouter([
   },
   {
     path: "/login-customer",
-    element: <CustomerOtpLogin />,
+    element: <LoginViews />,
+  },
+  {
+    path: "/register-customer",
+    element: <CustomerRegister />,
+  },
+  {
+    path: "/register-customer/verify",
+    element: <CustomerRegisterVerify />,
   },
   {
     path: "*",

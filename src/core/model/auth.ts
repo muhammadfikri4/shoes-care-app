@@ -18,3 +18,12 @@ export interface AuthRegisterDTO {
 export interface PayloadToken {
   userId: string;
 }
+
+export interface CustomerRegisterDTO {
+  email: string;
+  password: string;
+}
+export interface CustomerRegisterVerifyDTO {
+  key: string;
+  otp: string;
+}

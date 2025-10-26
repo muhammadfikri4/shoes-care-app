@@ -11,6 +11,8 @@ import {
 import { SidebarGroup } from "./SidebarGroup";
 import DSC from "@core/assets/logo/DSC.svg";
 import { Role } from "../../../../core/model/profile";
+import { useNavigate } from "react-router-dom";
+import { CONFIG_APP } from "@core/configs/app";
 
 export interface SidebarProps {
   role: Role;
@@ -26,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   defaultOpen = false,
 }) => {
   const isAdmin = role === "ADMIN";
+  const navigate = useNavigate();
 
   // === Mode controlled/uncontrolled
   const isControlled = typeof open === "boolean";
@@ -184,6 +187,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               "w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition",
               !effectiveOpen ? "justify-center md:justify-start" : "",
             ].join(" ")}
+            onClick={() => {
+              localStorage.removeItem(CONFIG_APP.TOKEN_KEY);
+              localStorage.removeItem(CONFIG_APP.REFRESH_TOKEN_KEY);
+              navigate(isAdmin ? "/login" : "/login-customer", {
+                replace: true,
+              });
+            }}
           >
             <LogOut size={20} />
             {effectiveOpen && (

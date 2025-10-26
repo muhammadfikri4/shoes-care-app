@@ -1,3 +1,4 @@
+import { useAtom } from "jotai";
 import React, { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -11,8 +12,9 @@ import { InputFile } from "../../_global/components/File";
 import { Input } from "../../_global/components/Input";
 import { Poppins } from "../../_global/components/Text";
 import { TextArea } from "../../_global/components/TextArea";
-import { defaultValue } from "../const";
+import { SidebarAtom } from "../../_global/store";
 import { useRacksList } from "../../rack/hooks/useRacks";
+import { defaultValue } from "../const";
 import { usePromoVerify, useTransactionCreate } from "../hooks/useTransactions";
 import { buildFormData } from "../utils/build-form-data";
 
@@ -21,7 +23,7 @@ export const TransactionCreate: React.FC = () => {
   const createMutation = useTransactionCreate();
   const promoVerify = usePromoVerify();
   const { data: racksData } = useRacksList();
-
+  const [sidebar] = useAtom(SidebarAtom);
   const format = useMemo(
     () =>
       new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }),
@@ -82,8 +84,8 @@ export const TransactionCreate: React.FC = () => {
         navigateTo: "/admin/transactions",
       }}
     >
-      <div className="pb-24">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
+      <div className="pb-24 flex flex-col gap-5">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
             <div>
               <div className="text-sm text-slate-600 mb-1">
@@ -189,37 +191,6 @@ export const TransactionCreate: React.FC = () => {
                     {promoVerify.data?.data?.discountPercent ?? 0}%
                   </div>
                 )}
-              </div>
-            )}
-            {form.paymentMethod === "CASH" && (
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-                <div>
-                  <div className="text-sm text-slate-600 mb-1">
-                    Uang Diterima
-                  </div>
-                  <Input
-                    type="number"
-                    value={form.cashPaid || undefined}
-                    onChange={(e) =>
-                      setForm((p) => ({
-                        ...p,
-                        cashPaid: Number(e.target.value || 0),
-                      }))
-                    }
-                    placeholder="Jumlah uang"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <div className="text-sm text-slate-600 mb-1">Kembalian</div>
-                  <div className="border rounded px-3 py-2 bg-slate-50">
-                    {new Intl.NumberFormat("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                    }).format(
-                      Math.max(0, Number(form.cashPaid || 0) - (total || 0))
-                    )}
-                  </div>
-                </div>
               </div>
             )}
           </div>
@@ -344,9 +315,50 @@ export const TransactionCreate: React.FC = () => {
             </div>
           </div>
         </div>
+        {form.paymentMethod === "CASH" ? (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+            <Poppins className="text-lg font-semibold mb-4">Pembayaran</Poppins>
+            <div className="space-y-4">
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                <div>
+                  <div className="text-sm text-slate-600 mb-1">
+                    Uang Diterima
+                  </div>
+                  <Input
+                    inputMode="decimal"
+                    currency
+                    value={form.cashPaid || undefined}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        cashPaid: Number(e.target.value || 0),
+                      }))
+                    }
+                    placeholder="Jumlah uang"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <div className="text-sm text-slate-600 mb-1">Kembalian</div>
+                  <div className="border rounded px-3 py-2 bg-slate-50">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(
+                      Math.max(0, Number(form.cashPaid || 0) - (total || 0))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-md z-30">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-md z-30 duration-300">
+          <div
+            className={`max-w-6xl mx-auto ${
+              sidebar ? "pl-24" : "pl-0"
+            } py-3 flex items-center justify-between duration-300`}
+          >
             <div className="font-semibold">Total: {format.format(total)}</div>
             <div>
               <Button

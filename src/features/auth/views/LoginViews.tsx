@@ -1,6 +1,6 @@
 // 📁 src/pages/Login.tsx
 import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { HiOutlineMail, HiUserCircle } from "react-icons/hi";
 import { BsShieldLock } from "react-icons/bs";
 import { IoEye, IoEyeOff } from "react-icons/io5";
@@ -24,7 +24,9 @@ export const LoginViews = () => {
   const { mutateAsync, isPending } = useLogin();
 
   const [data, setData] = useState<AuthLoginDTO>(defaultValue);
-  const [role, setRole] = useState<Role>("ADMIN");
+  const [sp] = useSearchParams();
+  const initialRole = (sp.get('role') as Role) || "ADMIN";
+  const [role, setRole] = useState<Role>(initialRole);
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -184,15 +186,12 @@ export const LoginViews = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-sm text-slate-600">
-            Pelanggan baru?{" "}
-            <Link
-              to="/login-customer"
-              className="text-blue-600 hover:underline ml-1"
-            >
-              Login via OTP
-            </Link>
-          </div>
+          {role === 'CUSTOMER' && (
+            <div className="mt-6 text-sm text-slate-600">
+              Belum punya akun?{' '}
+              <Link to="/register-customer" className="text-blue-600 hover:underline">Register</Link>
+            </div>
+          )}
 
           <div className="mt-3 text-xs text-slate-500 flex items-center gap-1">
             <HiUserCircle />

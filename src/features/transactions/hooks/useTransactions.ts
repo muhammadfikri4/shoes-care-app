@@ -41,6 +41,13 @@ export const useTransactionsList = () => {
   });
 };
 
+export const useMyTransactionsList = () => {
+  return useQuery({
+    queryKey: ["transactions-mine"],
+    queryFn: () => transactionsService.listMine(),
+  });
+};
+
 export const useTransactionCreate = () => {
   const navigate = useNavigate();
   return useMutation({
