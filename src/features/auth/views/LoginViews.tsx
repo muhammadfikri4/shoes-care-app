@@ -1,12 +1,12 @@
 // 📁 src/pages/Login.tsx
 import React, { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { HiOutlineMail, HiUserCircle } from "react-icons/hi";
 import { BsShieldLock } from "react-icons/bs";
+import { HiOutlineMail, HiUserCircle } from "react-icons/hi";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { TbShoe } from "react-icons/tb";
-import Chat from "../../../core/assets/logo/chat.png";
+import { Link, useSearchParams } from "react-router-dom";
+import DSC from "../../../core/assets/logo/DSC.svg";
 import { AuthLoginDTO } from "../../../core/model/auth";
 import { Button } from "../../_global/components/Button";
 import { Input } from "../../_global/components/Input";
@@ -25,7 +25,7 @@ export const LoginViews = () => {
 
   const [data, setData] = useState<AuthLoginDTO>(defaultValue);
   const [sp] = useSearchParams();
-  const initialRole = (sp.get('role') as Role) || "ADMIN";
+  const initialRole = (sp.get("role") as Role) || "ADMIN";
   const [role, setRole] = useState<Role>(initialRole);
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string>("");
@@ -54,16 +54,18 @@ export const LoginViews = () => {
           <div className="pointer-events-none absolute bottom-16 right-8 h-24 w-24 rounded-full bg-white/10 blur-lg" />
 
           <div>
-            <Poppins className="text-3xl font-bold">ShoesCare POS</Poppins>
+            <Poppins className="text-3xl font-bold">
+              Defend Shoes and Care
+            </Poppins>
             <p className="mt-2 text-white/90">
               Kelola transaksi cuci sepatu dengan cepat, aman, dan teratur.
             </p>
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="bg-white/10 backdrop-blur p-8 rounded-2xl border border-white/20 shadow-2xl">
+            <div className="bg-white/80 backdrop-blur p-8 rounded-2xl border border-white/20 shadow-2xl">
               <img
-                src={Chat}
+                src={DSC}
                 className="h-28 w-28 object-contain"
                 alt="ShoesCare"
               />
@@ -186,10 +188,15 @@ export const LoginViews = () => {
             </Button>
           </form>
 
-          {role === 'CUSTOMER' && (
+          {role === "CUSTOMER" && (
             <div className="mt-6 text-sm text-slate-600">
-              Belum punya akun?{' '}
-              <Link to="/register-customer" className="text-blue-600 hover:underline">Register</Link>
+              Sudah pernah melakukan transaksi namun belum memiliki akun?{" "}
+              <Link
+                to="/register-customer"
+                className="text-blue-600 hover:underline"
+              >
+                Register
+              </Link>
             </div>
           )}
 
