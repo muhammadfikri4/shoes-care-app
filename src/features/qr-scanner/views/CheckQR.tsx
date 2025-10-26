@@ -23,13 +23,13 @@ export const CheckQR: React.FC = () => {
   const navigate = useNavigate();
 
   const runLookup = async (q?: string) => {
-    const raw = (q ?? input)?.trim();
+    const raw = q || input;
+    console.log({ raw });
     if (!raw) return;
     setLoading(true);
     setError(null);
     try {
       const isQr = raw.includes(":"); // contoh: sc-pos:tx:INV-...
-      console.log({ isQr, raw });
       const res = await mutation.mutateAsync(
         isQr ? { qr: raw, code: "" } : { code: raw, qr: "" }
       );

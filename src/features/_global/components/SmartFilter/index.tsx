@@ -127,13 +127,24 @@ const Section: React.FC<CustomSectionProps> = memo(
         ].join(" ")}
       >
         {filterButton?.length || inputProps || action?.length ? (
-          <div className="px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div
+            className={
+              // ⬇ responsive layout: stack di mobile, horizontal di md+
+              "px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+            }
+          >
             {/* LEFT: Search input */}
-            <div className="flex items-center gap-3 flex-wrap">
+            <div
+              className={
+                // ⬇ full width di mobile
+                "flex items-center gap-3 flex-wrap w-full md:w-auto"
+              }
+            >
               {inputProps ? (
-                <div className="relative">
+                <div className="relative w-full md:w-72">
                   <Input
                     {...inputProps}
+                    className={["w-full", inputProps.className || ""].join(" ")}
                     value={searchValue}
                     LeftIcon={<FiSearch />}
                     onChange={(e) => {
@@ -147,20 +158,32 @@ const Section: React.FC<CustomSectionProps> = memo(
             </div>
 
             {/* RIGHT: Filters + Reset + Actions */}
-            <div className="flex items-center gap-3 flex-wrap justify-end">
+            <div
+              className={
+                // ⬇ di mobile: semua item full width & bertumpuk
+                "flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-wrap w-full md:w-auto"
+              }
+            >
               {filterButton?.map((item) => {
                 const selected = currentFilter[item.key] ?? {
                   label: "",
                   value: "",
                 };
 
+                // Wrapper agar full width di mobile; bisa override via widthClass
+                const wrapperClass =
+                  item.widthClass ??
+                  // default: full di mobile, ukuran tetap di md+
+                  "w-full md:w-56";
+
                 // Dropdown
                 if (item.dropdownProps) {
                   const { list, ...rest } = item.dropdownProps;
                   return (
-                    <div key={item.key} className={item.widthClass}>
+                    <div key={item.key} className={wrapperClass}>
                       <DropdownRevamp
                         {...rest}
+                        // pastikan komponen isi melebar
                         list={list}
                         defaultValue={
                           selected.value ? selected : rest.defaultValue
@@ -182,9 +205,13 @@ const Section: React.FC<CustomSectionProps> = memo(
                 // Plain input filter
                 if (item.inputProps) {
                   return (
-                    <div key={item.key} className={item.widthClass}>
+                    <div key={item.key} className={wrapperClass}>
                       <Input
                         {...item.inputProps}
+                        className={[
+                          "w-full",
+                          item.inputProps.className || "",
+                        ].join(" ")}
                         value={selected.value}
                         LeftIcon={item.inputProps.LeftIcon ?? <FiSearch />}
                         onChange={(e) => {
@@ -209,12 +236,15 @@ const Section: React.FC<CustomSectionProps> = memo(
                     key={item.key}
                     className={[
                       "flex items-center gap-2",
-                      item.widthClass || "",
+                      // ⬇ full di mobile
+                      wrapperClass,
                     ].join(" ")}
                   >
                     {item.dateProps ? (
                       <DatePicker
                         {...item.dateProps}
+                        // supaya komponen mengambil lebar penuh
+
                         selected={(isValid ? safeDate : undefined) as undefined}
                         onDayClick={(d, m, e) => {
                           const formatted = formatDateToMMDDYYYY(
@@ -231,13 +261,14 @@ const Section: React.FC<CustomSectionProps> = memo(
               })}
 
               {isReset ? (
-                <div className="w-28">
+                <div className="w-full md:w-28">
                   <Button
                     size="lg"
                     type="button"
                     onClick={reset}
                     title="Reset"
                     variant="danger"
+                    className="w-full"
                   >
                     Reset
                   </Button>
@@ -245,9 +276,18 @@ const Section: React.FC<CustomSectionProps> = memo(
               ) : null}
 
               {action?.length ? (
-                <div className="flex gap-2">
+                <div
+                  className={
+                    // tombol action juga full di mobile
+                    "flex flex-col md:flex-row gap-2 w-full md:w-auto"
+                  }
+                >
                   {action.map((btn, i) => (
-                    <Button key={i} {...btn}>
+                    <Button
+                      key={i}
+                      {...btn}
+                      className={`w-full md:w-auto ${btn.className || ""}`}
+                    >
                       {"label" in btn ? btn.label : "Action"}
                     </Button>
                   ))}

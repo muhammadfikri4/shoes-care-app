@@ -1,6 +1,6 @@
 import React from "react";
-import { Input } from "../../_global/components/Input";
 import { Button } from "../../_global/components/Button";
+import { Input } from "../../_global/components/Input";
 
 interface ManualQRCheckProps {
   input?: string;
@@ -22,7 +22,7 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
       <div className="flex justify-between gap-3 w-full">
         <div>
           <Input
-            placeholder="Masukkan QR (sc-pos:tx:INV-...) atau nomor invoice"
+            placeholder="Masukkan Kode Transaksi"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -32,9 +32,9 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
         </div>
         <div>
           <Button
-            onClick={runLookup}
+            type="button"
+            onClick={() => runLookup()}
             variant={isLoading || !input?.trim() ? "disabled" : "primary"}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition text-white rounded px-4"
           >
             {isLoading ? "Mengecek..." : "Cek"}
           </Button>
