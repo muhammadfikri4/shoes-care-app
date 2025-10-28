@@ -12,6 +12,7 @@ import { Button } from "../../_global/components/Button";
 import { Input } from "../../_global/components/Input";
 import { Poppins } from "../../_global/components/Text";
 import { useLogin } from "../hooks/useAuth";
+import { convertQueryParamsToObject } from "../../_global/helper";
 
 type Role = "CUSTOMER" | "ADMIN";
 
@@ -24,9 +25,10 @@ export const LoginViews = () => {
   const { mutateAsync, isPending } = useLogin();
 
   const [data, setData] = useState<AuthLoginDTO>(defaultValue);
-  const [sp] = useSearchParams();
-  const initialRole = (sp.get("role") as Role) || "ADMIN";
-  const [role, setRole] = useState<Role>(initialRole);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const role = (searchParams.get("role") as Role) || "ADMIN";
+  const queries = convertQueryParamsToObject(searchParams.toString());
+  const setRole = (role: Role) => setSearchParams({ ...queries, role });
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string>("");
 

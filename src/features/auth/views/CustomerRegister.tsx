@@ -1,23 +1,26 @@
 import DSC from "@core/assets/logo/DSC.svg";
 import React, { useState } from "react";
-import { BsShieldLock } from "react-icons/bs";
+import { BsPerson, BsShieldLock } from "react-icons/bs";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 import { Button } from "../../_global/components/Button";
 import { InputLabel } from "../../_global/components/InputLabel";
 import { useCustomerRegisterStart } from "../hooks/useCustomerRegister";
+import { AuthRegisterDTO } from "../../../core/model/auth";
 
 export const CustomerRegister: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [data, setData] = useState<Omit<AuthRegisterDTO, "confirmPassword">>({
+    email: "",
+    name: "",
+    password: "",
+  });
   const [show, setShow] = useState(false);
   const startMutation = useCustomerRegisterStart();
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    startMutation.mutate({ email, password });
+    startMutation.mutate(data);
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
       <div className="w-full max-w-xl rounded-2xl p-8 border border-slate-100 shadow-xl">
@@ -28,14 +31,29 @@ export const CustomerRegister: React.FC = () => {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <InputLabel
+              title="Nama"
+              direction="column"
+              titleSize="sm"
+              inputProps={{
+                LeftIcon: <BsPerson />,
+                value: data.name,
+                onChange: (e) =>
+                  setData((prev) => ({ ...prev, name: e.target.value })),
+                required: true,
+              }}
+            />
+          </div>
+          <div>
+            <InputLabel
               title="Email"
               direction="column"
               titleSize="sm"
               inputProps={{
                 LeftIcon: <MdOutlineAlternateEmail />,
                 type: "email",
-                value: email,
-                onChange: (e) => setEmail(e.target.value),
+                value: data.email,
+                onChange: (e) =>
+                  setData((prev) => ({ ...prev, email: e.target.value })),
                 required: true,
               }}
             />
@@ -50,7 +68,8 @@ export const CustomerRegister: React.FC = () => {
                 placeholder: "••••••••",
                 autoComplete: "new-password",
                 LeftIcon: <BsShieldLock className="text-gray-500" />,
-                onChange: (e) => setPassword(e.target.value),
+                onChange: (e) =>
+                  setData((prev) => ({ ...prev, password: e.target.value })),
                 RightIcon: (
                   <div
                     className="p-2 cursor-pointer"

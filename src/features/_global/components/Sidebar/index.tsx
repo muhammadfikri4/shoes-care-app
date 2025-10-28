@@ -13,6 +13,7 @@ import DSC from "@core/assets/logo/DSC.svg";
 import { Role } from "../../../../core/model/profile";
 import { useNavigate } from "react-router-dom";
 import { CONFIG_APP } from "@core/configs/app";
+import { IoTicketOutline } from "react-icons/io5";
 
 export interface SidebarProps {
   role: Role;
@@ -81,14 +82,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               icon: <ShoppingCart />,
             },
             { path: "/admin/racks", label: "Rak", icon: <Package /> },
+            { path: "/promos", label: "Promo", icon: <IoTicketOutline /> },
             { path: "/check-qr", label: "QR Code Check", icon: <QrCode /> },
           ]
-        : [
+          : [
             {
               path: "/my/transactions",
               label: "Riwayat Transaksi",
               icon: <History />,
             },
+            { path: "/promos", label: "Promo", icon: <IoTicketOutline /> },
             { path: "/check-qr", label: "QR Code Check", icon: <QrCode /> },
           ],
     [isAdmin]

@@ -51,8 +51,7 @@ export const useRegisterCustomer = () => {
     },
     onSuccess: (res) => {
       toast.success(res.message);
-      localStorage.setItem(CONFIG_APP.TOKEN_KEY, res?.data?.key ?? "");
-      navigate("/my/transactions");
+      navigate("/login?role=CUSTOMER");
     },
   });
 };

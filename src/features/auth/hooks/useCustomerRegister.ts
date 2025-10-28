@@ -15,19 +15,10 @@ export const useCustomerRegisterStart = () => {
     mutationKey: ["customer-register-start"],
     mutationFn: (body: CustomerRegisterDTO) =>
       authService.customerRegisterStart(body),
-    onError: (err: ApiResponse) =>
-      toast.error(err?.message || "Gagal mengirim OTP"),
-    onSuccess: (res, variables) => {
-      toast.success(res?.message || "OTP terkirim ke email");
-      const key = res?.data?.key as string | undefined;
-      const expiredAt = res?.data?.expiredAt as string | undefined;
-      if (key)
-        localStorage.setItem(
-          CONFIG_APP.TOKEN_KEY,
-          JSON.stringify({ key, expiredAt })
-        );
-      const email = variables.email;
-      navigate(`/register-customer/verify?email=${encodeURIComponent(email)}`);
+    onError: (err: ApiResponse) => toast.error(err?.message || "Registrasi gagal"),
+    onSuccess: () => {
+      toast.success("Registrasi berhasil. Silakan login");
+      navigate(`/login?role=CUSTOMER`);
     },
   });
 };

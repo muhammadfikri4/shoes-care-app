@@ -21,9 +21,9 @@ export const authService = {
     API_ENDPOINT.auth.refreshToken
   ),
   customerRegisterStart: request.post<
-    ApiResponse<{ key: string; expiredAt: string }>,
+    ApiResponse<{ ok: boolean }>,
     CustomerRegisterDTO
-  >(`${API_ENDPOINT.auth.base}/customer/register`),
+  >(`${API_ENDPOINT.auth.base}/register/customer`),
   customerRegisterVerify: request.post<
     ApiResponse<{ ok: boolean }>,
     CustomerRegisterVerifyDTO

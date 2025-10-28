@@ -20,6 +20,7 @@ export interface PayloadToken {
 }
 
 export interface CustomerRegisterDTO {
+  name?: string;
   email: string;
   password: string;
 }

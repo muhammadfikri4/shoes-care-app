@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "../Button";
 
 // Types
 export interface ModalAction {
@@ -27,17 +28,6 @@ export interface ModalProps {
   contentClassName?: string;
 }
 
-// Button variants
-const buttonVariants = {
-  primary:
-    "bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500",
-  secondary:
-    "bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300 focus-visible:ring-gray-400",
-  danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
-  success:
-    "bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500",
-};
-
 // Modal sizes
 const modalSizes: Record<NonNullable<ModalProps["size"]>, string> = {
   sm: "max-w-sm",
@@ -46,7 +36,6 @@ const modalSizes: Record<NonNullable<ModalProps["size"]>, string> = {
   xl: "max-w-2xl",
   full: "max-w-[min(100vw,80rem)] mx-4",
 };
-
 
 // Header icon per variant (ukuran konsisten + tanpa margin internal yang ganggu layout)
 const IconSuccess = () => (
@@ -314,21 +303,24 @@ export const Modal: React.FC<ModalProps> = ({
             <div className="h-px bg-gray-200/70 mb-4" />
             <div className="flex flex-wrap items-center justify-end gap-3">
               {actions.map((action, idx) => (
-                <button
-                  key={idx}
-                  onClick={action.onClick}
-                  disabled={action.disabled || action.loading}
-                  className={[
-                    "px-4 py-2 rounded-lg font-medium transition-all",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
-                    "active:scale-95 inline-flex items-center gap-2",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                    buttonVariants[action.variant || "secondary"],
-                  ].join(" ")}
-                >
-                  {action.loading && <LoadingSpinner />}
-                  <span>{action.label}</span>
-                </button>
+                <div>
+                  {" "}
+                  <Button
+                    key={idx}
+                    onClick={action.onClick}
+                    disabled={action.disabled || action.loading}
+                    // className={[
+                    //   "px-4 py-2 rounded-lg font-medium transition-all",
+                    //   "disabled:opacity-50 disabled:cursor-not-allowed",
+                    //   "active:scale-95 inline-flex items-center gap-2",
+                    //   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                    //   buttonVariants[action.variant || "secondary"],
+                    // ].join(" ")}
+                  >
+                    {action.loading && <LoadingSpinner />}
+                    {action.label}
+                  </Button>
+                </div>
               ))}
             </div>
           </div>

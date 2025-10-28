@@ -5,13 +5,13 @@ import { RootLayout } from "../../features/_global/views/Root";
 import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
 import { CustomerRegister } from "../../features/auth/views/CustomerRegister";
-import { CustomerRegisterVerify } from "../../features/auth/views/CustomerRegisterVerify";
 import { ProfileViews } from "../../features/profile/views/ProfileViews";
 import { CheckQR } from "../../features/qr-scanner/views/CheckQR";
 import { RacksManagement } from "../../features/rack/views/Rack";
 import { TransactionCreate } from "../../features/transactions/views/TransactionCreate";
 import { TransactionDetail } from "../../features/transactions/views/TransactionDetail";
 import { TransactionsAdmin } from "../../features/transactions/views/TransactionsAdmin";
+import { PromosAdmin } from "../../features/promos/views/PromosAdmin";
 import { TransactionsCustomer } from "../../features/transactions/views/TransactionsCustomer";
 import { Protected } from "../../features/_global/views/Protected";
 
@@ -53,6 +53,10 @@ export const router = createBrowserRouter([
         element: <TransactionDetail />,
       },
       {
+        path: "/promos",
+        element: <PromosAdmin />,
+      },
+      {
         path: "/check-qr",
         element: <CheckQR />,
       },
@@ -73,10 +77,6 @@ export const router = createBrowserRouter([
   {
     path: "/register-customer",
     element: <CustomerRegister />,
-  },
-  {
-    path: "/register-customer/verify",
-    element: <CustomerRegisterVerify />,
   },
   {
     path: "*",

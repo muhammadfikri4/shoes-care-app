@@ -8,6 +8,7 @@ import {
   TransactionLookupModel,
   TransactionModel,
 } from "@core/model/transaction";
+import { PromoModel, PromoCheckResponse } from "@core/model/promo";
 
 // Racks
 export const racksService = {
@@ -53,5 +54,13 @@ export const transactionsService = {
   ),
   markCompleted: request.post<ApiResponse<OkResponse>, { id: string }>(
     `${API_ENDPOINT.pos.transactions}/complete`
+  ),
+};
+
+// Promos
+export const promosService = {
+  list: request.get<ApiResponse<PromoModel[]>>(API_ENDPOINT.pos.promos),
+  check: request.get<ApiResponse<PromoCheckResponse>>(
+    `${API_ENDPOINT.pos.promos}/check`
   ),
 };

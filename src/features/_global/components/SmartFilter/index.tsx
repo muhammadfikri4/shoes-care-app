@@ -121,7 +121,7 @@ const Section: React.FC<CustomSectionProps> = memo(
     return (
       <div
         className={[
-          "border border-gray-200 rounded-md",
+          "border border-gray-200 rounded-md overflow-hidden",
           className || "",
           "w-full",
         ].join(" ")}
