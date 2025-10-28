@@ -38,6 +38,7 @@ export const useTransactionsList = () => {
           ...(search && { search }),
         },
       }),
+    refetchOnMount: "always",
   });
 };
 
