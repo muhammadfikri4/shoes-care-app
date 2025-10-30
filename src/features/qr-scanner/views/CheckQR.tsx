@@ -29,7 +29,7 @@ export const CheckQR: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const isQr = raw.includes(":"); // contoh: sc-pos:tx:INV-...
+      const isQr = raw.startsWith("qr-"); // contoh: qr-TRX-...
       const res = await mutation.mutateAsync(
         isQr ? { qr: raw, code: "" } : { code: raw, qr: "" }
       );

@@ -109,7 +109,7 @@ yarn dev        # atau: npm run dev
   - `GET /transactions/lookup?qr=... | ?invoice=...`
   - `POST /transactions/scan` (pickup by QR)
 
-> **Format QR**: `sc-pos:tx:{INVOICE}`
+> **Format QR**: `qr-{INVOICE}`
 
 ## 🧩 Komponen Kunci
 - `LoginView`: form **Email, Password, Login sebagai (Admin/Customer)** dengan segmented control.
