@@ -7,6 +7,8 @@ import {
   AuthRegisterDTO,
   CustomerRegisterDTO,
   CustomerRegisterVerifyDTO,
+  ForgotPasswordCustomerDTO,
+  ResetPasswordCustomerDTO,
 } from "@core/model/auth";
 
 export const authService = {
@@ -28,4 +30,12 @@ export const authService = {
     ApiResponse<{ ok: boolean }>,
     CustomerRegisterVerifyDTO
   >(`${API_ENDPOINT.auth.base}/customer/register/verify`),
+  forgotPasswordCustomer: request.post<
+    ApiResponse<{ ok: boolean; message: string }>,
+    Pick<ForgotPasswordCustomerDTO, 'email'>
+  >(`${API_ENDPOINT.auth.base}/forgot-password/customer`),
+  resetPasswordCustomer: request.post<
+    ApiResponse<{ ok: boolean; message: string }>,
+    ResetPasswordCustomerDTO
+  >(`${API_ENDPOINT.auth.base}/reset-password/customer`),
 };

@@ -28,3 +28,13 @@ export interface CustomerRegisterVerifyDTO {
   key: string;
   otp: string;
 }
+
+export interface ForgotPasswordCustomerDTO {
+  email: string;
+  callback?: <T>(res?: T) => void
+}
+
+export interface ResetPasswordCustomerDTO {
+  resetPasswordToken: string;
+  password: string;
+}

@@ -154,7 +154,17 @@ export const LoginViews = () => {
             </div>
 
             <div className="flex flex-col gap-1">
-              <Poppins className="text-sm">Password</Poppins>
+              <div className="flex items-center justify-between">
+                <Poppins className="text-sm">Password</Poppins>
+                {role === "CUSTOMER" && (
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Lupa Password?
+                  </Link>
+                )}
+              </div>
               <Input
                 type={show ? "text" : "password"}
                 placeholder="••••••••"

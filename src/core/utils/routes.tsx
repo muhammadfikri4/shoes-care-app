@@ -5,6 +5,8 @@ import { RootLayout } from "../../features/_global/views/Root";
 import { LoginViews } from "../../features/auth/views/LoginViews";
 import { RegisterViews } from "../../features/auth/views/RegisterViews";
 import { CustomerRegister } from "../../features/auth/views/CustomerRegister";
+import { ForgotPasswordView } from "../../features/auth/views/ForgotPasswordView";
+import { ResetPasswordView } from "../../features/auth/views/ResetPasswordView";
 import { ProfileViews } from "../../features/profile/views/ProfileViews";
 import { CheckQR } from "../../features/qr-scanner/views/CheckQR";
 import { RacksManagement } from "../../features/rack/views/Rack";
@@ -77,6 +79,14 @@ export const router = createBrowserRouter([
   {
     path: "/register-customer",
     element: <CustomerRegister />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordView />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordView />,
   },
   {
     path: "*",
