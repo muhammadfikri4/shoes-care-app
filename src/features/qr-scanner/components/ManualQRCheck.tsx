@@ -7,7 +7,6 @@ interface ManualQRCheckProps {
   runLookup: VoidFunction;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   isLoading?: boolean;
-  error?: string;
 }
 
 export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
@@ -15,7 +14,6 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
   setInput,
   input,
   isLoading,
-  error,
 }) => {
   return (
     <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
@@ -40,7 +38,6 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
           </Button>
         </div>
       </div>
-      {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
     </div>
   );
 };

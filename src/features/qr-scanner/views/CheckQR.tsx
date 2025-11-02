@@ -6,6 +6,7 @@ import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp
 import { useLookupTransaction } from "../../transactions/hooks/useTransactions";
 import { HeaderQRCheck } from "../components/HeaderQRCheck";
 import { ManualQRCheck } from "../components/ManualQRCheck";
+import { InvalidQRResult } from "../components/InvalidQRResult";
 import { useQrScanner } from "../hooks/useQrScanner";
 import { ApiResponse } from "../../../core/libs/api/types";
 
@@ -49,6 +50,15 @@ export const CheckQR: React.FC = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const clearError = () => {
+    setError(null);
+    setInput("");
+    // Restart camera jika dalam mode scan
+    if (mode === "scan" && !active) {
+      start(currentCamId || undefined);
     }
   };
 
@@ -97,7 +107,6 @@ export const CheckQR: React.FC = () => {
         <ManualQRCheck
           runLookup={runLookup}
           setInput={setInput}
-          error={error || undefined}
           input={input}
           isLoading={loading}
         />
@@ -185,6 +194,13 @@ export const CheckQR: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Error Modal */}
+      <InvalidQRResult
+        show={!!error}
+        error={error || ""}
+        onRetry={clearError}
+      />
     </BaseLayout>
   );
 };
