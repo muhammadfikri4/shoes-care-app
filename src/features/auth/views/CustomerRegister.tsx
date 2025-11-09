@@ -21,6 +21,8 @@ export const CustomerRegister: React.FC = () => {
     e.preventDefault();
     startMutation.mutate(data);
   };
+  const disabled =
+    startMutation.isPending || !data.email || !data.password || !data.name;
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
       <div className="w-full max-w-xl rounded-2xl p-8 border border-slate-100 shadow-xl">
@@ -83,8 +85,8 @@ export const CustomerRegister: React.FC = () => {
             />
           </div>
           <div>
-            <Button variant={startMutation.isPending ? "disabled" : "primary"}>
-              {startMutation.isPending ? "Memproses..." : "Kirim OTP"}
+            <Button variant={disabled ? "disabled" : "primary"}>
+              {startMutation.isPending ? "Memproses..." : "Register"}
             </Button>
           </div>
         </form>
