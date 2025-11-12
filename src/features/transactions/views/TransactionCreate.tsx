@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import {
   TransactionCreationDTO,
@@ -14,12 +14,14 @@ import { Poppins } from "../../_global/components/Text";
 import { TextArea } from "../../_global/components/TextArea";
 import { SidebarAtom } from "../../_global/store";
 import { useRacksList } from "../../rack/hooks/useRacks";
+import { CashPaymentModal } from "../components/CashPaymentModal";
 import { defaultValue } from "../const";
 import { usePromoVerify, useTransactionCreate } from "../hooks/useTransactions";
 import { buildFormData } from "../utils/build-form-data";
 
 export const TransactionCreate: React.FC = () => {
   const [form, setForm] = useState<TransactionCreationDTO>(defaultValue);
+  const [showCashModal, setShowCashModal] = useState(false);
   const createMutation = useTransactionCreate();
   const promoVerify = usePromoVerify();
   const { data: racksData } = useRacksList();
@@ -72,9 +74,31 @@ export const TransactionCreate: React.FC = () => {
       toast.error("Pilih minimal satu Nomor Rak pada Items");
       return;
     }
+
+    // Jika payment method CASH, tampilkan modal
+    if (form.paymentMethod === "CASH") {
+      setShowCashModal(true);
+      return;
+    }
+
+    // Jika QRIS, langsung submit
     const formData = buildFormData(form);
     createMutation.mutate(formData);
   };
+
+  const handleCashPaymentConfirm = (cashPaid: number) => {
+    // Update form dengan cashPaid
+    const updatedForm = { ...form, cashPaid };
+    const formData = buildFormData(updatedForm);
+    createMutation.mutate(formData);
+  };
+
+  // Close modal when mutation is successful
+  useEffect(() => {
+    if (createMutation.isSuccess) {
+      setShowCashModal(false);
+    }
+  }, [createMutation.isSuccess]);
 
   return (
     <BaseLayout
@@ -315,43 +339,6 @@ export const TransactionCreate: React.FC = () => {
             </div>
           </div>
         </div>
-        {form.paymentMethod === "CASH" ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-            <Poppins className="text-lg font-semibold mb-4">Pembayaran</Poppins>
-            <div className="space-y-4">
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-                <div>
-                  <div className="text-sm text-slate-600 mb-1">
-                    Uang Diterima
-                  </div>
-                  <Input
-                    inputMode="decimal"
-                    currency
-                    value={form.cashPaid || undefined}
-                    onChange={(e) =>
-                      setForm((p) => ({
-                        ...p,
-                        cashPaid: Number(e.target.value || 0),
-                      }))
-                    }
-                    placeholder="Jumlah uang"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <div className="text-sm text-slate-600 mb-1">Kembalian</div>
-                  <div className="border rounded px-3 py-2 bg-slate-50">
-                    {new Intl.NumberFormat("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                    }).format(
-                      Math.max(0, Number(form.cashPaid || 0) - (total || 0))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
 
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-md z-30 duration-300">
           <div
@@ -371,6 +358,15 @@ export const TransactionCreate: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Pembayaran Cash */}
+      <CashPaymentModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+        totalPrice={total}
+        onConfirm={handleCashPaymentConfirm}
+        isLoading={createMutation.isPending}
+      />
     </BaseLayout>
   );
 };
