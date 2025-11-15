@@ -91,6 +91,7 @@ export interface TransactionLookupModel {
   price: number;
   finalPrice: number;
   promoApplied: boolean;
+  qrCodeUrl?: string | null;
   customer: {
     name: string;
     phone: string;

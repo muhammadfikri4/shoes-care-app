@@ -158,9 +158,14 @@ export const Modal: React.FC<ModalProps> = ({
     [onClose, closeOnEscape]
   );
 
-  // Overlay click
+  // Overlay click: close when clicking outside the panel (backdrop area)
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget && closeOnOverlayClick) onClose();
+    if (!closeOnOverlayClick) return;
+    const target = event.target as Node;
+    const panel = panelRef.current;
+    if (panel && !panel.contains(target)) {
+      onClose();
+    }
   };
 
   // Focus mgmt: trap + restore

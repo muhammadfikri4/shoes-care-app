@@ -4,13 +4,13 @@ import React, {
   PropsWithChildren,
   useCallback,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useSearchParams } from "react-router-dom";
 import { formatDateToMMDDYYYY } from "../../utils/format";
 import { Button } from "../Button";
+import { CustomDatePicker } from "../CustomDate";
 import { DatePicker, DateProps } from "../Date";
 import { DropdownRevamp, IDropdownProps } from "../Dropdown/DropdownRevamp";
 import { Input, InputProps } from "../Input";
@@ -29,6 +29,10 @@ interface FilterButtonProps {
   dropdownProps?: IDropdownProps;
   /** pakai input date / date range */
   dateProps?: DateProps;
+  /** gunakan CustomDatePicker untuk range tanggal dalam satu komponen */
+  dateRange?: boolean;
+  /** jika dateRange=true, tentukan key start & end untuk query params */
+  dateRangeKeys?: { startKey: string; endKey: string };
 
   inputProps?: InputProps;
   /** lebar kolom (Tailwind) */
@@ -63,11 +67,10 @@ const Section: React.FC<CustomSectionProps> = memo(
       }
     }, [searchParams]);
 
-    // --- Input Search (debounced) ---
+    // --- Input Search (commit langsung ke query params) ---
     const [searchValue, setSearchValue] = useState(
       currentFilter?.search?.value ?? ""
     );
-    const debounceTimer = useRef<number | null>(null);
 
     const commitFilter = useCallback(
       (next: FilterKey["filter"]) => {
@@ -85,18 +88,15 @@ const Section: React.FC<CustomSectionProps> = memo(
     const handleSearchChange = useCallback(
       (value: string) => {
         setSearchValue(value);
-        if (debounceTimer.current) window.clearTimeout(debounceTimer.current);
-        debounceTimer.current = window.setTimeout(() => {
-          const curr = { ...currentFilter };
-          if (!value) {
-            const { search, ...rest } = curr;
-            void search;
-            commitFilter(rest);
-          } else {
-            curr.search = { label: value, value };
-            commitFilter(curr);
-          }
-        }, 400);
+        const curr = { ...currentFilter };
+        if (!value) {
+          const { search, ...rest } = curr;
+          void search;
+          commitFilter(rest);
+        } else {
+          curr.search = { label: value, value };
+          commitFilter(curr);
+        }
       },
       [commitFilter, currentFilter]
     );
@@ -121,7 +121,7 @@ const Section: React.FC<CustomSectionProps> = memo(
     return (
       <div
         className={[
-          "border border-gray-200 rounded-md overflow-hidden",
+          "border border-gray-200 rounded-md overflow-visible relative z-10",
           className || "",
           "w-full",
         ].join(" ")}
@@ -164,6 +164,20 @@ const Section: React.FC<CustomSectionProps> = memo(
                 "flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-wrap w-full md:w-auto"
               }
             >
+              {isReset ? (
+                <div className="w-full md:w-28">
+                  <Button
+                    size="lg"
+                    type="button"
+                    onClick={reset}
+                    title="Reset"
+                    variant="danger"
+                    className="w-full"
+                  >
+                    Reset
+                  </Button>
+                </div>
+              ) : null}
               {filterButton?.map((item) => {
                 const selected = currentFilter[item.key] ?? {
                   label: "",
@@ -225,26 +239,57 @@ const Section: React.FC<CustomSectionProps> = memo(
                   );
                 }
 
-                // Date / Date Range
-                const safeDate = selected.value
-                  ? new Date(selected.value)
-                  : undefined;
-                const isValid = !!(safeDate && !isNaN(safeDate.getTime()));
+                // Date range via CustomDatePicker
+                if (item.dateRange && item.dateRangeKeys) {
+                  const startVal =
+                    currentFilter[item.dateRangeKeys.startKey]?.value;
+                  const endVal =
+                    currentFilter[item.dateRangeKeys.endKey]?.value;
+                  const start = startVal ? new Date(startVal) : undefined;
+                  const end = endVal ? new Date(endVal) : undefined;
+                  return (
+                    <div key={item.key} className={wrapperClass}>
+                      <CustomDatePicker
+                        range
+                        value={{ start, end }}
+                        placeholder="Pilih rentang tanggal"
+                        onChange={({ start, end }) => {
+                          const s = start
+                            ? formatDateToMMDDYYYY(start, "YYYY-MM-DD")
+                            : "";
+                          const e = end
+                            ? formatDateToMMDDYYYY(end, "YYYY-MM-DD")
+                            : "";
+                          const next = { ...currentFilter };
+                          if (s && item?.dateRangeKeys?.startKey)
+                            next[item?.dateRangeKeys?.startKey] = {
+                              label: s,
+                              value: s,
+                            };
+                          else delete next[item?.dateRangeKeys?.startKey || ""];
+                          if (e && item?.dateRangeKeys?.endKey)
+                            next[item.dateRangeKeys.endKey] = {
+                              label: e,
+                              value: e,
+                            };
+                          else delete next[item?.dateRangeKeys?.endKey || ""];
+                          commitFilter(next);
+                        }}
+                      />
+                    </div>
+                  );
+                }
 
-                return (
-                  <div
-                    key={item.key}
-                    className={[
-                      "flex items-center gap-2",
-                      // ⬇ full di mobile
-                      wrapperClass,
-                    ].join(" ")}
-                  >
-                    {item.dateProps ? (
+                // Single date via DatePicker
+                if (item.dateProps) {
+                  const safeDate = selected.value
+                    ? new Date(selected.value)
+                    : undefined;
+                  const isValid = !!(safeDate && !isNaN(safeDate.getTime()));
+                  return (
+                    <div key={item.key} className={wrapperClass}>
                       <DatePicker
                         {...item.dateProps}
-                        // supaya komponen mengambil lebar penuh
-
                         selected={(isValid ? safeDate : undefined) as undefined}
                         onDayClick={(d, m, e) => {
                           const formatted = formatDateToMMDDYYYY(
@@ -255,25 +300,12 @@ const Section: React.FC<CustomSectionProps> = memo(
                           item.dateProps?.onDayClick?.(d, m, e);
                         }}
                       />
-                    ) : null}
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                }
 
-              {isReset ? (
-                <div className="w-full md:w-28">
-                  <Button
-                    size="lg"
-                    type="button"
-                    onClick={reset}
-                    title="Reset"
-                    variant="danger"
-                    className="w-full"
-                  >
-                    Reset
-                  </Button>
-                </div>
-              ) : null}
+                return null;
+              })}
 
               {action?.length ? (
                 <div

@@ -24,6 +24,7 @@
     "cropperjs": "^1.6.2",
     "date-fns": "2.30.0",
     "date-fns-tz": "1.1.4",
+    "dayjs": "^1.11.19",
     "html-react-parser": "^5.2.3",
     "jotai": "^2.9.1",
     "jspdf": "^2.5.2",

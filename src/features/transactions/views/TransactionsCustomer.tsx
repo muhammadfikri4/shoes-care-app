@@ -7,7 +7,7 @@ import { Poppins } from "../../_global/components/Text";
 import { formatTime } from "../../_global/lib/format-time";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 import { useMyTransactionsList } from "../hooks/useTransactions";
-import { TransactionModel } from "@core/model/transaction";
+import { TransactionModel, TRANSACTION_STATUS } from "@core/model/transaction";
 import { CustomSection } from "../../_global/components/SmartFilter";
 
 export const TransactionsCustomer: React.FC = () => {
@@ -17,7 +17,32 @@ export const TransactionsCustomer: React.FC = () => {
 
   return (
     <BaseLayout title="Riwayat Transaksi">
-      <CustomSection>
+      <CustomSection
+        inputProps={{ placeholder: "Cari kode transaksi..." }}
+        filterButton={[
+          {
+            key: "status",
+            widthClass: "w-40",
+            dropdownProps: {
+              placeholder: "Status",
+              list: [
+                { label: "Semua", value: "" },
+                { label: "Menunggu", value: TRANSACTION_STATUS.CREATED },
+                { label: "Diproses", value: TRANSACTION_STATUS.IN_PROGRESS },
+                { label: "Siap Diambil", value: TRANSACTION_STATUS.READY_TO_PICKUP },
+                { label: "Selesai", value: TRANSACTION_STATUS.COMPLETED },
+                { label: "Dibatalkan", value: TRANSACTION_STATUS.CANCELLED },
+              ],
+            },
+          },
+          {
+            key: "dateRange",
+            widthClass: "w-full md:w-72",
+            dateRange: true,
+            dateRangeKeys: { startKey: "startDate", endKey: "endDate" },
+          },
+        ]}
+      >
         {/* Mobile cards */}
         <div className="block md:hidden space-y-3">
           {items.length > 0 ? (
@@ -31,9 +56,7 @@ export const TransactionsCustomer: React.FC = () => {
                     <Poppins className="text-sm font-semibold text-slate-900">
                       {t.code}
                     </Poppins>
-                    <div className="mt-1 text-xs text-slate-600">
-                      {t.customerName || t.customerEmail || "-"}
-                    </div>
+                    {/* Customer POV: sembunyikan info pelanggan */}
                   </div>
                   <TransactionStatusBadge status={t.status} />
                 </div>

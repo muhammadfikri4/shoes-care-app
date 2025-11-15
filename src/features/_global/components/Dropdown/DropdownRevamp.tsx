@@ -92,18 +92,15 @@ export const DropdownRevamp: React.FC<IDropdownProps> = ({
       const viewportW = window.innerWidth;
 
       const spaceBelow = viewportH - rect.bottom;
-      const spaceAbove = rect.top;
 
-      const menuDesiredHeight = 384; // ~max-h-96
-      const openUp = spaceBelow < 240 && spaceAbove > spaceBelow; // buka ke atas jika bawah sempit
+      const gap = 8; // jarak antara trigger dan menu
+      const minHeight = 120; // tinggi minimal menu
 
-      const top = openUp
-        ? Math.max(8, rect.top - Math.min(menuDesiredHeight, spaceAbove) - 8)
-        : rect.bottom + 8;
+      // Selalu buka ke bawah
+      const maxHeight = Math.max(minHeight, spaceBelow - 16);
+      const top = rect.bottom + gap;
+
       const left = Math.min(rect.left, viewportW - rect.width - 8);
-      const maxHeight = openUp
-        ? Math.max(120, spaceAbove - 16)
-        : Math.max(120, spaceBelow - 16);
 
       setPos({
         top: Math.round(top),

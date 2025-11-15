@@ -26,19 +26,13 @@ export const TransactionsAdmin: React.FC = () => {
     >
       <CustomSection
         className="w-full"
-        inputProps={{}}
+        inputProps={{ placeholder: "Cari kode transaksi..." }}
         filterButton={[
           {
-            key: "minPrice",
-            inputProps: {
-              placeholder: "Min Harga",
-            },
-          },
-          {
-            key: "maxPrice",
-            inputProps: {
-              placeholder: "Max Harga",
-            },
+            key: "dateRange",
+            widthClass: "w-full md:w-64",
+            dateRange: true,
+            dateRangeKeys: { startKey: "startDate", endKey: "endDate" },
           },
           {
             key: "status",
@@ -108,7 +102,7 @@ export const TransactionsAdmin: React.FC = () => {
             ))
           ) : (
             <div className="text-center text-sm text-slate-500 py-8 bg-white rounded-lg border border-slate-200">
-              Tidak ada transaksi.
+              Tidak Ada Transaksi
             </div>
           )}
         </div>

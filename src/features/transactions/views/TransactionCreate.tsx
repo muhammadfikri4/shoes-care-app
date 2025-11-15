@@ -77,7 +77,11 @@ export const TransactionCreate: React.FC = () => {
 
     // Jika pakai promo, langsung submit tanpa modal (auto CASH)
     if (form.usePromo) {
-      const formData = buildFormData({ ...form, paymentMethod: "CASH", cashPaid: 0 });
+      const formData = buildFormData({
+        ...form,
+        paymentMethod: "CASH",
+        cashPaid: 0,
+      });
       createMutation.mutate(formData);
       return;
     }
@@ -165,20 +169,18 @@ export const TransactionCreate: React.FC = () => {
             <div>
               <div className="text-sm text-slate-600 mb-1">
                 Metode Pembayaran
-                {form.usePromo && (
-                  <span className="text-xs text-slate-500 ml-2">
-                    (Otomatis Cash saat pakai promo)
-                  </span>
-                )}
               </div>
               <DropdownRevamp
                 defaultValue={{
-                  label: form.paymentMethod === "CASH" ? "Tunai" : form.paymentMethod,
+                  label:
+                    form.paymentMethod === "CASH"
+                      ? "Tunai"
+                      : form.paymentMethod,
                   value: form.paymentMethod,
                 }}
                 list={[
                   { label: "QRIS", value: "QRIS" },
-                  { label: "Tunai", value: "CASH" },
+                  { label: "Cash", value: "CASH" },
                 ]}
                 onChange={(e) =>
                   setForm((p) => ({
@@ -189,54 +191,100 @@ export const TransactionCreate: React.FC = () => {
                 disabled={form.usePromo}
               />
             </div>
-            <div className="flex items-center gap-3 mt-1">
-              <label className="inline-flex items-center gap-2">
-                <Input
+            <div className="md:col-span-2">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
                   type="checkbox"
                   checked={form.usePromo}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, usePromo: e.target.checked }))
                   }
+                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                 />
-                <span className="text-sm text-slate-700">Gunakan Promo?</span>
+                <span className="text-sm font-medium text-slate-700">
+                  Gunakan Kode Promo
+                </span>
               </label>
             </div>
             {form.usePromo && (
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-                <div className="md:col-span-2">
-                  <div className="text-sm text-slate-600 mb-1">Kode Promo</div>
-                  <Input
-                    value={form.promoCode}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, promoCode: e.target.value }))
-                    }
-                    placeholder="Masukkan kode promo"
-                  />
-                </div>
-                <div>
-                  <Button
-                    onClick={() =>
-                      promoVerify.mutate({
-                        email: form.customerEmail,
-                        code: form.promoCode,
-                      })
-                    }
-                    disabled={!form.customerEmail || !form.promoCode}
-                  >
-                    Cek Kode
-                  </Button>
-                </div>
-                {promoVerify.isError && (
-                  <div className="text-red-600 text-sm md:col-span-3">
-                    {promoVerify.error?.message || "Kode tidak valid"}
+              <div className="md:col-span-2">
+                <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                  <div className="text-sm font-medium text-slate-700 mb-3">
+                    Kode Promo
                   </div>
-                )}
-                {promoVerify.isSuccess && (
-                  <div className="text-emerald-600 text-sm md:col-span-3">
-                    Kode valid. Diskon{" "}
-                    {promoVerify.data?.data?.discountPercent ?? 0}%
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex-1">
+                      <Input
+                        value={form.promoCode}
+                        onChange={(e) =>
+                          setForm((p) => ({ ...p, promoCode: e.target.value }))
+                        }
+                        placeholder="Masukkan kode promo"
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="sm:w-auto w-full">
+                      <Button
+                        onClick={() =>
+                          promoVerify.mutate({
+                            email: form.customerEmail,
+                            code: form.promoCode,
+                          })
+                        }
+                        disabled={
+                          !form.customerEmail ||
+                          !form.promoCode ||
+                          promoVerify.isPending
+                        }
+                        variant={
+                          !form.customerEmail || !form.promoCode
+                            ? "disabled"
+                            : "primary"
+                        }
+                        className="w-full sm:w-auto whitespace-nowrap"
+                      >
+                        {promoVerify.isPending ? "Mengecek..." : "Cek Kode"}
+                      </Button>
+                    </div>
                   </div>
-                )}
+                  {promoVerify.isSuccess && (
+                    <div className="mt-3 flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">
+                      <svg
+                        className="w-5 h-5 flex-shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        Kode valid! Diskon{" "}
+                        {promoVerify.data?.data?.discountPercent ?? 0}%
+                      </span>
+                    </div>
+                  )}
+                  {promoVerify.isError && (
+                    <div className="mt-3 flex items-center gap-2 text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                      <svg
+                        className="w-5 h-5 flex-shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        Kode promo tidak valid
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

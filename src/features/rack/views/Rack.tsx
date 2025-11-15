@@ -1,16 +1,15 @@
 import { RackModel } from "@core/model/rack";
 import { racksService } from "@core/services/pos";
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { Modal } from "../../_global/components/Dialog/dialog-v2";
 import { Drawer } from "../../_global/components/Drawer"; // sesuaikan path jika berbeda
+import { InputLabel } from "../../_global/components/InputLabel";
 import { MasterTable } from "../../_global/components/MasterTable";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
 import { useRacksList } from "../hooks/useRacks";
-import { InputLabel } from "../../_global/components/InputLabel";
-import { BaseLayout } from "../../_global/components/BaseLayout";
 
 type RackPayload = {
   code: string;
@@ -21,7 +20,6 @@ type RackPayload = {
 type DrawerMode = "create" | "edit";
 
 export const RacksManagement: React.FC = () => {
-  const navigate = useNavigate();
   const { data, refetch, isFetching } = useRacksList();
 
   // Drawer states
@@ -142,18 +140,13 @@ export const RacksManagement: React.FC = () => {
               return: (r: RackModel) => <Poppins>{r.name || "-"}</Poppins>,
             },
             {
-              return: (r: RackModel) => <Poppins>{r.description || "-"}</Poppins>,
+              return: (r: RackModel) => (
+                <Poppins>{r.description || "-"}</Poppins>
+              ),
             },
             {
               return: (r: RackModel) => (
                 <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => navigate(r.id)}
-                  >
-                    Detail
-                  </Button>
                   <Button
                     size="sm"
                     variant="secondary"

@@ -1,8 +1,13 @@
 import DSC from "@core/assets/logo/DSC.svg";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { TRANSACTION_STATUS } from "../../../core/model/transaction";
 import { BaseLayout } from "../../_global/components/BaseLayout";
+import { Button } from "../../_global/components/Button";
 import { LoadingFallback } from "../../_global/components/Loading";
+import { NotFound } from "../../_global/components/NotFound";
 import { formatTime } from "../../_global/lib/format-time";
+import { QRCodeModal } from "../components/QRCodeModal";
+import { TransactionConfirmationModal } from "../components/TransactionConfirmationModal";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 import { TransactionTimeline } from "../components/TransactionTimeline";
 import {
@@ -10,19 +15,33 @@ import {
   useMarkCompleted,
   useMarkReadyToPickup,
 } from "../hooks/useTransactions";
-import { Button } from "../../_global/components/Button";
-import { TRANSACTION_STATUS } from "../../../core/model/transaction";
 
 export const TransactionDetail: React.FC = () => {
   const { data: transaction, isFetching, error } = useDetailTransaction();
   const markReady = useMarkReadyToPickup();
   const markDone = useMarkCompleted();
+  const [showReadyModal, setShowReadyModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
 
   const format = useMemo(
     () =>
       new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }),
     []
   );
+
+  // Close modals on successful mutation
+  useEffect(() => {
+    if (markReady.isSuccess) {
+      setShowReadyModal(false);
+    }
+  }, [markReady.isSuccess]);
+
+  useEffect(() => {
+    if (markDone.isSuccess) {
+      setShowCompleteModal(false);
+    }
+  }, [markDone.isSuccess]);
 
   if (isFetching) {
     return (
@@ -31,7 +50,15 @@ export const TransactionDetail: React.FC = () => {
       </div>
     );
   }
-  if (error) return <div className="p-4 text-red-600">{error?.message}</div>;
+  if (error)
+    return (
+      <>
+        <div className="w-screen h-screen flex flex-col items-center justify-center p-4 text-red-600">
+          <NotFound withBackButton width={"30rem"} gap={'1rem'} />
+        </div>
+        ;
+      </>
+    );
 
   const items = transaction?.data?.items ?? [];
 
@@ -43,30 +70,32 @@ export const TransactionDetail: React.FC = () => {
       }}
       actionType="node"
       action={
-        <>
+        <div className="flex md:flex-row flex-col gap-2">
+          {transaction?.data?.qrCodeUrl && (
+            <div className="md:w-40 w-full">
+              <Button variant="secondary" onClick={() => setShowQRModal(true)}>
+                Lihat QR Code
+              </Button>
+            </div>
+          )}
           {transaction?.data?.status === "IN_PROGRESS" && (
-            <Button
-              variant={markReady.isPending ? "disabled" : "primary"}
-              onClick={() =>
-                transaction?.data?.id &&
-                markReady.mutate({ id: transaction.data.id })
-              }
-            >
-              {markReady.isPending ? "Memproses..." : "Siap Diambil"}
-            </Button>
+            <div className="md:w-40 w-full">
+              <Button variant="primary" onClick={() => setShowReadyModal(true)}>
+                Siap Diambil
+              </Button>
+            </div>
           )}
           {transaction?.data?.status === TRANSACTION_STATUS.READY_TO_PICKUP && (
-            <Button
-              variant={markDone.isPending ? "disabled" : "success"}
-              onClick={() =>
-                transaction?.data?.id &&
-                markDone.mutate({ id: transaction.data.id })
-              }
-            >
-              {markDone.isPending ? "Memproses..." : "Selesai"}
-            </Button>
+            <div className="md:w-40 w-full">
+              <Button
+                variant="success"
+                onClick={() => setShowCompleteModal(true)}
+              >
+                Selesai
+              </Button>
+            </div>
           )}
-        </>
+        </div>
       }
     >
       <div className="flex flex-col gap-4">
@@ -101,7 +130,9 @@ export const TransactionDetail: React.FC = () => {
               <div className="text-slate-500 text-xs sm:text-sm">Status</div>
               <div className="mt-0.5">
                 <TransactionStatusBadge
-                  status={transaction?.data?.status || TRANSACTION_STATUS.CREATED}
+                  status={
+                    transaction?.data?.status || TRANSACTION_STATUS.CREATED
+                  }
                 />
               </div>
             </div>
@@ -155,6 +186,44 @@ export const TransactionDetail: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal Konfirmasi Siap Diambil */}
+      <TransactionConfirmationModal
+        isOpen={showReadyModal}
+        onClose={() => setShowReadyModal(false)}
+        onConfirm={() => {
+          if (transaction?.data?.id) {
+            markReady.mutate({ id: transaction.data.id });
+          }
+        }}
+        type="ready"
+        transactionCode={transaction?.data?.code}
+        isPending={markReady.isPending}
+      />
+
+      {/* Modal Konfirmasi Selesai */}
+      <TransactionConfirmationModal
+        isOpen={showCompleteModal}
+        onClose={() => setShowCompleteModal(false)}
+        onConfirm={() => {
+          if (transaction?.data?.id) {
+            markDone.mutate({ id: transaction.data.id });
+          }
+        }}
+        type="complete"
+        transactionCode={transaction?.data?.code}
+        isPending={markDone.isPending}
+      />
+
+      {/* Modal QR Code */}
+      {transaction?.data?.qrCodeUrl && (
+        <QRCodeModal
+          isOpen={showQRModal}
+          onClose={() => setShowQRModal(false)}
+          qrCodeUrl={transaction.data.qrCodeUrl}
+          transactionCode={transaction.data.code}
+        />
+      )}
     </BaseLayout>
   );
 };

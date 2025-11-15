@@ -55,12 +55,12 @@ export const BaseLayout: React.FC<PageLayoutProps> = ({
       className={[
         `w-full duration-300 ${
           open ? "md:pl-64" : "md:pl-16"
-        } py-4 mx-auto space-y-6`,
+        } py-4 mx-auto space-y-6 md:gap-0 gap-4`,
         className || "",
       ].join()}
     >
       {/* Header */}
-      <div className="flex md:items-center md:justify-between md:gap-0 gap-6">
+      <div className="flex md:flex-row flex-col md:items-center md:justify-between md:gap-0 gap-2">
         {(title || backButton || breadcrumb) && (
           <div
             className={[

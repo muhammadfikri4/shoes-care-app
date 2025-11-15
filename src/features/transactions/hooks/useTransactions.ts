@@ -9,32 +9,33 @@ import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 
 interface TransactionQueryParams extends QueryParams {
-  minPrice?: BaseValue;
-  maxPrice?: BaseValue;
   status?: BaseValue;
+  startDate?: BaseValue;
+  endDate?: BaseValue;
+  search?: BaseValue;
   code?: string;
   qr?: string;
 }
 
 export const useTransactionsList = () => {
   const filter = useQueryParamsFilter<TransactionQueryParams>();
-  const search = useDebounce(filter?.search, 500);
+  const search = useDebounce(filter?.search?.value, 500);
   return useQuery({
     queryKey: [
       "transactions",
       {
         search,
-        minPrice: filter?.minPrice,
-        maxPrice: filter?.maxPrice,
         status: filter?.status,
+        startDate: filter?.startDate,
+        endDate: filter?.endDate,
       },
     ],
     queryFn: () =>
       transactionsService.list({
         queryParams: {
-          ...(filter?.minPrice && { minPrice: filter.minPrice?.value }),
-          ...(filter?.maxPrice && { maxPrice: filter.maxPrice?.value }),
-          ...(filter?.status && { status: filter.status?.value }),
+          ...(filter?.status?.value && { status: filter.status?.value }),
+          ...(filter?.startDate && { startDate: filter.startDate?.value }),
+          ...(filter?.endDate && { endDate: filter.endDate?.value }),
           ...(search && { search }),
         },
       }),
@@ -43,9 +44,27 @@ export const useTransactionsList = () => {
 };
 
 export const useMyTransactionsList = () => {
+  const filter = useQueryParamsFilter<TransactionQueryParams>();
+  const search = useDebounce(filter?.search?.value, 500);
   return useQuery({
-    queryKey: ["transactions-mine"],
-    queryFn: () => transactionsService.listMine(),
+    queryKey: [
+      "transactions-mine",
+      {
+        search,
+        status: filter?.status,
+        startDate: filter?.startDate,
+        endDate: filter?.endDate,
+      },
+    ],
+    queryFn: () =>
+      transactionsService.listMine({
+        queryParams: {
+          ...(filter?.status?.value && { status: filter.status?.value }),
+          ...(filter?.startDate && { startDate: filter.startDate?.value }),
+          ...(filter?.endDate && { endDate: filter.endDate?.value }),
+          ...(search && { search }),
+        },
+      }),
   });
 };
 
