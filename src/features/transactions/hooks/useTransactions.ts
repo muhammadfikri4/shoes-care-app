@@ -8,11 +8,11 @@ import useDebounce from "../../_global/hooks/useDebounce";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 
-interface TransactionQueryParams extends QueryParams {
+interface TransactionQueryParams extends Omit<QueryParams, "search"> {
   status?: BaseValue;
+  search?: BaseValue;
   startDate?: BaseValue;
   endDate?: BaseValue;
-  search?: BaseValue;
   code?: string;
   qr?: string;
 }
