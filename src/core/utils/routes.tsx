@@ -16,6 +16,7 @@ import { TransactionsAdmin } from "../../features/transactions/views/Transaction
 import { PromosAdmin } from "../../features/promos/views/PromosAdmin";
 import { TransactionsCustomer } from "../../features/transactions/views/TransactionsCustomer";
 import { Protected } from "../../features/_global/views/Protected";
+import { TransactionPortal } from "../../features/transactions/views/TransactionPortal";
 
 export const router = createBrowserRouter([
   {
@@ -87,6 +88,10 @@ export const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPasswordView />,
+  },
+  {
+    path: "/transaction/portal/:id",
+    element: <TransactionPortal />,
   },
   {
     path: "*",

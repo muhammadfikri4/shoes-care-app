@@ -46,6 +46,9 @@ export const transactionsService = {
   getById: request.get<ApiResponse<TransactionLookupModel>>(
     API_ENDPOINT.pos.transactions
   ),
+  portalGetById: request.get<ApiResponse<TransactionLookupModel>>(
+    API_ENDPOINT.portal.transaction
+  ),
   verifyPromo: request.post<ApiResponse<PromoVerifyResponse>>(
     `${API_ENDPOINT.pos.transactions}/promo/verify`
   ),

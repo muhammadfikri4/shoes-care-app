@@ -33,9 +33,9 @@ export const useTransactionsList = () => {
     queryFn: () =>
       transactionsService.list({
         queryParams: {
-          ...(filter?.status?.value && { status: filter.status?.value }),
-          ...(filter?.startDate && { startDate: filter.startDate?.value }),
-          ...(filter?.endDate && { endDate: filter.endDate?.value }),
+          ...(filter?.status?.value && { status: filter?.status?.value }),
+          ...(filter?.startDate && { startDate: filter?.startDate?.value }),
+          ...(filter?.endDate && { endDate: filter?.endDate?.value }),
           ...(search && { search }),
         },
       }),
@@ -59,9 +59,9 @@ export const useMyTransactionsList = () => {
     queryFn: () =>
       transactionsService.listMine({
         queryParams: {
-          ...(filter?.status?.value && { status: filter.status?.value }),
-          ...(filter?.startDate && { startDate: filter.startDate?.value }),
-          ...(filter?.endDate && { endDate: filter.endDate?.value }),
+          ...(filter?.status?.value && { status: filter?.status?.value }),
+          ...(filter?.startDate && { startDate: filter?.startDate?.value }),
+          ...(filter?.endDate && { endDate: filter?.endDate?.value }),
           ...(search && { search }),
         },
       }),
@@ -157,5 +157,17 @@ export const useMarkCompleted = () => {
       });
     },
     onError: (err) => toast.error(err.message),
+  });
+};
+
+export const usePortalTransaction = (id?: string) => {
+  return useQuery({
+    queryKey: ["portal-transaction", { id }],
+    queryFn: () =>
+      transactionsService.portalGetById({
+        path: id,
+      }),
+    enabled: !!id,
+    refetchOnWindowFocus: false,
   });
 };

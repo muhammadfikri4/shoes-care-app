@@ -6,10 +6,10 @@ import {
 
 const steps: { key: Exclude<TransactionStatus, "CANCELLED">; label: string }[] =
   [
-    { key: TRANSACTION_STATUS.CREATED, label: "Pending" },
-    { key: TRANSACTION_STATUS.IN_PROGRESS, label: "On Process" },
-    { key: TRANSACTION_STATUS.READY_TO_PICKUP, label: "Ready to Pick Up" },
-    { key: TRANSACTION_STATUS.COMPLETED, label: "Completed" }, 
+    { key: TRANSACTION_STATUS.CREATED, label: "Dibuat" },
+    { key: TRANSACTION_STATUS.IN_PROGRESS, label: "Diproses" },
+    { key: TRANSACTION_STATUS.READY_TO_PICKUP, label: "Siap Diambil" },
+    { key: TRANSACTION_STATUS.COMPLETED, label: "Selesai" },
   ];
 
 const colorClassIdx = (
@@ -47,50 +47,54 @@ export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
               ? "bg-blue-600 ring-blue-100"
               : "bg-slate-300 ring-slate-100";
 
-        return (
-          <li key={s.key} className="ms-4 py-3">
-            <span
-              className={`absolute -start-1.5 mt-1.5 size-3 rounded-full ring-2 ${nodeClass}`}
-              aria-hidden
-            />
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span
-                  className={[
-                    "text-sm font-medium",
-                    isCancelled && i === idx
-                      ? "text-red-700"
-                      : active
-                      ? "text-slate-900"
-                      : done
-                      ? "text-slate-700"
-                      : "text-slate-500",
-                  ].join(" ")}
-                >
-                  {s.label}
-                </span>
+          return (
+            <li key={s.key} className="ms-4 py-3">
+              <span
+                className={`absolute -start-1.5 mt-1.5 size-3 rounded-full ring-2 ${nodeClass}`}
+                aria-hidden
+              />
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={[
+                      "text-sm font-medium",
+                      isCancelled && i === idx
+                        ? "text-red-700"
+                        : active
+                        ? "text-slate-900"
+                        : done
+                        ? "text-slate-700"
+                        : "text-slate-500",
+                    ].join(" ")}
+                  >
+                    {s.label}
+                  </span>
 
-                {isCancelled && i === idx && (
-                  <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] bg-red-50 text-red-700">
-                    Dibatalkan
-                  </span>
-                )}
-                {active && !isCancelled && (
-                  <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-700">
-                    Berjalan
-                  </span>
-                )}
+                  {isCancelled && i === idx && (
+                    <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] bg-red-50 text-red-700">
+                      Dibatalkan
+                    </span>
+                  )}
+                  {active && !isCancelled && (
+                    <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] bg-blue-50 text-blue-700">
+                      Berjalan
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-500">
+                  {s.key === TRANSACTION_STATUS.CREATED &&
+                    "Transaksi Telah Dibuat"}
+                  {s.key === TRANSACTION_STATUS.IN_PROGRESS &&
+                    "Transaksi Sedang Diproses"}
+                  {s.key === TRANSACTION_STATUS.READY_TO_PICKUP &&
+                    "Transaksi Sudah Siap Diambil"}
+                  {s.key === TRANSACTION_STATUS.COMPLETED &&
+                    "Transaksi Sudah Selesai"}
+                </p>
               </div>
-
-              <p className="text-xs text-slate-500">
-                {s.key === TRANSACTION_STATUS.CREATED && "Transaksi dibuat"}
-                {s.key === TRANSACTION_STATUS.IN_PROGRESS && "Sedang diproses"}
-                {s.key === TRANSACTION_STATUS.READY_TO_PICKUP && "Siap diambil"}
-                {s.key === TRANSACTION_STATUS.COMPLETED && "Selesai"}
-              </p>
-            </div>
-          </li>
-        );
+            </li>
+          );
         })}
       </ol>
 
@@ -132,10 +136,14 @@ export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
                 </div>
 
                 <div className="mt-0.5 text-xs text-slate-500 line-clamp-2">
-                  {s.key === TRANSACTION_STATUS.CREATED && "Transaksi dibuat"}
-                  {s.key === TRANSACTION_STATUS.IN_PROGRESS && "Sedang diproses"}
-                  {s.key === TRANSACTION_STATUS.READY_TO_PICKUP && "Siap diambil"}
-                  {s.key === TRANSACTION_STATUS.COMPLETED && "Selesai"}
+                  {s.key === TRANSACTION_STATUS.CREATED &&
+                    "Transaksi Telah Dibuat"}
+                  {s.key === TRANSACTION_STATUS.IN_PROGRESS &&
+                    "Transaksi Sedang Diproses"}
+                  {s.key === TRANSACTION_STATUS.READY_TO_PICKUP &&
+                    "Transaksi Sudah Siap Diambil"}
+                  {s.key === TRANSACTION_STATUS.COMPLETED &&
+                    "Transaksi Sudah Selesai"}
                   {cancelledHere && " — Dibatalkan"}
                 </div>
               </div>

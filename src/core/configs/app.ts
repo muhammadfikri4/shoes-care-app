@@ -26,5 +26,8 @@ export const API_ENDPOINT = {
     transactionsLookup: `${CONFIG_APP.BASE_URL}/transactions/lookup`,
     promos: `${CONFIG_APP.BASE_URL}/promos`,
   },
+  portal: {
+    transaction: `${CONFIG_APP.BASE_URL}/transactions/portal`,
+  },
   // legacy OTP login removed
 };
