@@ -17,10 +17,11 @@ const colorClassIdx = (
   targetIndex: number,
   isCancelled: boolean
 ) => {
+  if (index > targetIndex) return;
   if (isCancelled) {
-    return index < targetIndex ? "bg-red-600" : "bg-slate-200";
+    return index < targetIndex ? "bg-red-600" : "bg-blue-200";
   }
-  return index < targetIndex ? "bg-blue-600" : "bg-slate-200";
+  return "bg-blue-600";
 };
 
 export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
@@ -106,12 +107,12 @@ export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
           const cancelledHere = isCancelled && i === idx;
 
           const nodeClass = cancelledHere
-            ? "bg-red-600 border-red-600 text-white"
+            ? "bg-red-600 text-white"
             : active
-            ? "bg-primary border-blue-600 text-white"
+            ? "bg-primary text-white"
             : done
-            ? "bg-success border-green-600 text-white"
-            : "bg-white border-slate-300 text-slate-400";
+            ? "bg-success text-white"
+            : "bg-white text-slate-400";
 
           const connectorClass = colorClassIdx(i, idx, isCancelled);
 
@@ -149,11 +150,11 @@ export const TransactionTimeline: React.FC<{ status: TransactionStatus }> = ({
               </div>
 
               {/* Connector */}
-              {i < steps.length - 1 && (
-                <div className="flex-1 mx-2">
-                  <div className={`h-0.5 w-full ${connectorClass}`} />
-                </div>
-              )}
+              <div className="flex-1 w-full">
+                <div
+                  className={`h-0.5 w-full rounded-full ${connectorClass}`}
+                />
+              </div>
             </React.Fragment>
           );
         })}
