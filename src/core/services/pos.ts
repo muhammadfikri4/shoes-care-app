@@ -15,12 +15,12 @@ export const racksService = {
   list: request.get<ApiResponse<RackModel[]>>(API_ENDPOINT.pos.racks),
   create: request.post<
     ApiResponse<RackModel>,
-    { code: string; name?: string; location?: string }
+    { code: string; name?: string; description?: string }
   >(API_ENDPOINT.pos.racks),
   update: (id: string) =>
     request.put<
       ApiResponse<RackModel>,
-      { code?: string; name?: string; location?: string }
+      { code?: string; name?: string; description?: string }
     >(`${API_ENDPOINT.pos.racks}/${id}`),
   remove: (id: string) =>
     request.delete<ApiResponse<OkResponse>>(`${API_ENDPOINT.pos.racks}/${id}`),

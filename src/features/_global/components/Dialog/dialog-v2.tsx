@@ -308,14 +308,8 @@ export const Modal: React.FC<ModalProps> = ({
                   <Button
                     key={idx}
                     onClick={action.onClick}
+                    variant={action.variant}
                     disabled={action.disabled || action.loading}
-                    // className={[
-                    //   "px-4 py-2 rounded-lg font-medium transition-all",
-                    //   "disabled:opacity-50 disabled:cursor-not-allowed",
-                    //   "active:scale-95 inline-flex items-center gap-2",
-                    //   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                    //   buttonVariants[action.variant || "secondary"],
-                    // ].join(" ")}
                   >
                     {action.loading && <LoadingSpinner />}
                     {action.label}

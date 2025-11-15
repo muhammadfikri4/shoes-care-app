@@ -71,7 +71,7 @@ export const TransactionsCustomer: React.FC = () => {
               "top-right": false,
             }}
             data={items || []}
-            title={["Code", "Tanggal", "Status", "Aksi"]}
+            title={["Kode", "Tanggal", "Status", "Aksi"]}
             columnTable={[
               {
                 return: ({ code }) => (

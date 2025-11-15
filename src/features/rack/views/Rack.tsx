@@ -1,6 +1,5 @@
 import { RackModel } from "@core/model/rack";
 import { racksService } from "@core/services/pos";
-import { Badge } from "@features/_global/components/Badge";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../_global/components/Button";
@@ -16,7 +15,7 @@ import { BaseLayout } from "../../_global/components/BaseLayout";
 type RackPayload = {
   code: string;
   name?: string;
-  location?: string;
+  description?: string;
 };
 
 type DrawerMode = "create" | "edit";
@@ -48,7 +47,7 @@ export const RacksManagement: React.FC = () => {
   const openCreate = () => {
     setDrawerMode("create");
     setEditingId(null);
-    setForm({ code: "", name: "", location: "" });
+    setForm({ code: "", name: "", description: "" });
     setDrawerOpen(true);
   };
 
@@ -59,7 +58,7 @@ export const RacksManagement: React.FC = () => {
     setForm({
       code: r.code,
       name: r.name ?? "",
-      location: r.location ?? "",
+      description: r.description ?? "",
     });
     setDrawerOpen(true);
   };
@@ -83,13 +82,13 @@ export const RacksManagement: React.FC = () => {
         await racksService.create({
           code: form.code.trim(),
           name: form.name?.trim() || undefined,
-          location: form.location?.trim() || undefined,
+          description: form.description?.trim() || undefined,
         });
       } else if (drawerMode === "edit" && editingId) {
         await racksService.update(editingId)({
           code: form.code.trim(),
           name: form.name?.trim() || undefined,
-          location: form.location?.trim() || undefined,
+          description: form.description?.trim() || undefined,
         });
       }
       await refetch();
@@ -132,7 +131,7 @@ export const RacksManagement: React.FC = () => {
       <CustomSection>
         <MasterTable
           border={{ bottom: true, top: true, left: true, right: true }}
-          title={["Kode", "Nama", "Lokasi", "Status", "Aksi"]}
+          title={["Kode", "Nama", "Deskripsi", "Aksi"]}
           isLoading={isFetching}
           data={racks}
           columnTable={[
@@ -143,23 +142,7 @@ export const RacksManagement: React.FC = () => {
               return: (r: RackModel) => <Poppins>{r.name || "-"}</Poppins>,
             },
             {
-              return: (r: RackModel) => <Poppins>{r.location || "-"}</Poppins>,
-            },
-            {
-              return: (r: RackModel) => (
-                <Badge
-                  variant={
-                    r.status === "AVAILABLE"
-                      ? "success"
-                      : r.status === "OCCUPIED"
-                      ? "warning"
-                      : "secondary"
-                  }
-                  size="sm"
-                >
-                  {r.status}
-                </Badge>
-              ),
+              return: (r: RackModel) => <Poppins>{r.description || "-"}</Poppins>,
             },
             {
               return: (r: RackModel) => (
@@ -296,12 +279,12 @@ const RackForm: React.FC<{
           <InputLabel
             titleSize="sm"
             gap="sm"
-            title="Lokasi"
+            title="Deskripsi"
             inputProps={{
-              placeholder: "Lokasi rak (opsional)",
-              value: form.location,
+              placeholder: "Deskripsi rak (opsional)",
+              value: form.description,
               onChange: (e) =>
-                setForm((s) => ({ ...s, location: e.target.value })),
+                setForm((s) => ({ ...s, description: e.target.value })),
             }}
           />
         </div>

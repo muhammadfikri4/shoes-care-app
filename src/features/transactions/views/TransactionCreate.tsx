@@ -66,7 +66,7 @@ export const TransactionCreate: React.FC = () => {
 
   const submit = async () => {
     if (!form.customerName.trim() || !form.customerEmail.trim()) {
-      toast.error("Customer Name dan Email wajib diisi");
+      toast.error("Nama dan Email Pelanggan wajib diisi");
       return;
     }
     const firstRack = form.items.find((i) => i.rack?.id);
@@ -75,7 +75,14 @@ export const TransactionCreate: React.FC = () => {
       return;
     }
 
-    // Jika payment method CASH, tampilkan modal
+    // Jika pakai promo, langsung submit tanpa modal (auto CASH)
+    if (form.usePromo) {
+      const formData = buildFormData({ ...form, paymentMethod: "CASH", cashPaid: 0 });
+      createMutation.mutate(formData);
+      return;
+    }
+
+    // Jika payment method CASH (tanpa promo), tampilkan modal
     if (form.paymentMethod === "CASH") {
       setShowCashModal(true);
       return;
@@ -92,6 +99,13 @@ export const TransactionCreate: React.FC = () => {
     const formData = buildFormData(updatedForm);
     createMutation.mutate(formData);
   };
+
+  // Auto set payment method to CASH when using promo
+  useEffect(() => {
+    if (form.usePromo) {
+      setForm((p) => ({ ...p, paymentMethod: "CASH" }));
+    }
+  }, [form.usePromo]);
 
   // Close modal when mutation is successful
   useEffect(() => {
@@ -113,19 +127,19 @@ export const TransactionCreate: React.FC = () => {
           <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
             <div>
               <div className="text-sm text-slate-600 mb-1">
-                Customer Name <span className="text-red-500">(Required)</span>
+                Nama Pelanggan <span className="text-red-500">(Wajib)</span>
               </div>
               <Input
                 value={form.customerName}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, customerName: e.target.value }))
                 }
-                placeholder="Nama Customer"
+                placeholder="Nama Pelanggan"
               />
             </div>
             <div>
               <div className="text-sm text-slate-600 mb-1">
-                Customer Email <span className="text-red-500">(Required)</span>
+                Email Pelanggan <span className="text-red-500">(Wajib)</span>
               </div>
               <Input
                 type="email"
@@ -133,31 +147,38 @@ export const TransactionCreate: React.FC = () => {
                 onChange={(e) =>
                   setForm((p) => ({ ...p, customerEmail: e.target.value }))
                 }
-                placeholder="Email Customer"
+                placeholder="Email Pelanggan"
               />
             </div>
             <div>
               <div className="text-sm text-slate-600 mb-1">
-                Customer Phone <span className="text-red-500">(Required)</span>
+                Nomor Telepon <span className="text-red-500">(Wajib)</span>
               </div>
               <Input
                 value={form.customerPhone}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, customerPhone: e.target.value }))
                 }
-                placeholder="No. HP"
+                placeholder="Nomor Telepon"
               />
             </div>
             <div>
-              <div className="text-sm text-slate-600 mb-1">Payment Method</div>
+              <div className="text-sm text-slate-600 mb-1">
+                Metode Pembayaran
+                {form.usePromo && (
+                  <span className="text-xs text-slate-500 ml-2">
+                    (Otomatis Cash saat pakai promo)
+                  </span>
+                )}
+              </div>
               <DropdownRevamp
                 defaultValue={{
-                  label: form.paymentMethod,
+                  label: form.paymentMethod === "CASH" ? "Tunai" : form.paymentMethod,
                   value: form.paymentMethod,
                 }}
                 list={[
                   { label: "QRIS", value: "QRIS" },
-                  { label: "Cash", value: "CASH" },
+                  { label: "Tunai", value: "CASH" },
                 ]}
                 onChange={(e) =>
                   setForm((p) => ({
@@ -165,6 +186,7 @@ export const TransactionCreate: React.FC = () => {
                     paymentMethod: e.value as "QRIS" | "CASH",
                   }))
                 }
+                disabled={form.usePromo}
               />
             </div>
             <div className="flex items-center gap-3 mt-1">
@@ -176,13 +198,13 @@ export const TransactionCreate: React.FC = () => {
                     setForm((p) => ({ ...p, usePromo: e.target.checked }))
                   }
                 />
-                <span className="text-sm text-slate-700">Use Promo?</span>
+                <span className="text-sm text-slate-700">Gunakan Promo?</span>
               </label>
             </div>
             {form.usePromo && (
               <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                 <div className="md:col-span-2">
-                  <div className="text-sm text-slate-600 mb-1">Promo Code</div>
+                  <div className="text-sm text-slate-600 mb-1">Kode Promo</div>
                   <Input
                     value={form.promoCode}
                     onChange={(e) =>
@@ -222,7 +244,7 @@ export const TransactionCreate: React.FC = () => {
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <Poppins className="text-lg font-semibold mb-4">
-            Items Transaction
+            Item Transaksi
           </Poppins>
           <div className="space-y-4">
             {form.items.map((it, idx) => (
@@ -304,7 +326,7 @@ export const TransactionCreate: React.FC = () => {
                   </div>
                   <div className="md:col-span-2">
                     <Poppins className="text-sm text-slate-600 mb-1">
-                      Upload Photo
+                      Unggah Foto
                     </Poppins>
 
                     <InputFile
@@ -352,7 +374,7 @@ export const TransactionCreate: React.FC = () => {
                 onClick={submit}
                 variant={createMutation.isPending ? "disabled" : "primary"}
               >
-                {createMutation.isPending ? "Loading..." : "Submit"}
+                {createMutation.isPending ? "Memproses..." : "Buat Transaksi"}
               </Button>
             </div>
           </div>

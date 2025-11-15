@@ -52,7 +52,7 @@ export const TransactionDetail: React.FC = () => {
                 markReady.mutate({ id: transaction.data.id })
               }
             >
-              {markReady.isPending ? "Loading..." : "Ready To Pick Up"}
+              {markReady.isPending ? "Memproses..." : "Siap Diambil"}
             </Button>
           )}
           {transaction?.data?.status === TRANSACTION_STATUS.READY_TO_PICKUP && (
@@ -63,7 +63,7 @@ export const TransactionDetail: React.FC = () => {
                 markDone.mutate({ id: transaction.data.id })
               }
             >
-              {markDone.isPending ? "Loading..." : "Completed"}
+              {markDone.isPending ? "Memproses..." : "Selesai"}
             </Button>
           )}
         </>

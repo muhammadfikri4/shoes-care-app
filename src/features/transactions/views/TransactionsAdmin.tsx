@@ -51,19 +51,19 @@ export const TransactionsAdmin: React.FC = () => {
                   value: "",
                 },
                 {
-                  label: "Pending",
+                  label: "Menunggu",
                   value: "CREATED",
                 },
                 {
-                  label: "On Process",
+                  label: "Diproses",
                   value: "IN_PROGRESS",
                 },
                 {
-                  label: "Ready to Pick Up",
+                  label: "Siap Diambil",
                   value: TRANSACTION_STATUS.READY_TO_PICKUP,
                 },
                 {
-                  label: "Completed",
+                  label: "Selesai",
                   value: "COMPLETED",
                 },
               ],
@@ -124,7 +124,7 @@ export const TransactionsAdmin: React.FC = () => {
               "top-right": false,
             }}
             data={items || []}
-            title={["Code", "Customer", "Tanggal", "Status", "Aksi"]}
+            title={["Kode", "Pelanggan", "Tanggal", "Status", "Aksi"]}
             columnTable={[
               {
                 return: ({ code }) => (

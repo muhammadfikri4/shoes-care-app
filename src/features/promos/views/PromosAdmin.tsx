@@ -38,12 +38,12 @@ export const PromosAdmin: React.FC = () => {
             }}
             data={items || []}
             title={[
-              "Code",
-              "Customer",
-              "Discount",
+              "Kode",
+              "Pelanggan",
+              "Diskon",
               "Status",
-              "Used",
-              "Created At",
+              "Terpakai",
+              "Dibuat Pada",
             ]}
             columnTable={[
               {
@@ -64,13 +64,13 @@ export const PromosAdmin: React.FC = () => {
               {
                 return: ({ isActive }) => (
                   <Poppins className="text-sm">
-                    {isActive ? "Active" : "Inactive"}
+                    {isActive ? "Aktif" : "Tidak Aktif"}
                   </Poppins>
                 ),
               },
               {
                 return: ({ used }) => (
-                  <Poppins className="text-sm">{used ? "Yes" : "No"}</Poppins>
+                  <Poppins className="text-sm">{used ? "Ya" : "Tidak"}</Poppins>
                 ),
               },
               {
@@ -95,7 +95,7 @@ export const PromosAdmin: React.FC = () => {
                 <div className="text-sm text-slate-600">
                   {p.user?.email || "-"}
                 </div>
-                <div className="text-sm">Discount: {p.discountPercent}%</div>
+                <div className="text-sm">Diskon: {p.discountPercent}%</div>
                 <div className="text-xs text-slate-500">
                   {new Date(p.createdAt).toLocaleString()}
                 </div>

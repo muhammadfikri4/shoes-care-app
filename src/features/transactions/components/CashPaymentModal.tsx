@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { Modal } from "../../_global/components/Dialog/dialog-v2";
 import { Input } from "../../_global/components/Input";
@@ -18,7 +18,7 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
   onConfirm,
   isLoading = false,
 }) => {
-  const [cashPaid, setCashPaid] = useState<number>(0);
+  const [cashPaidInput, setCashPaidInput] = useState<string>("");
 
   const format = useMemo(
     () =>
@@ -26,13 +26,17 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
     []
   );
 
-  const change = useMemo(() => {
-    return Math.max(0, cashPaid - totalPrice);
-  }, [cashPaid, totalPrice]);
+  const cashPaidNumber = useMemo(() => {
+    return Number(cashPaidInput) || 0;
+  }, [cashPaidInput]);
 
-  const handleConfirm = () => {
+  const change = useMemo(() => {
+    return Math.max(0, cashPaidNumber - totalPrice);
+  }, [cashPaidNumber, totalPrice]);
+
+  const handleConfirm = useCallback(() => {
     // Validasi: uang yang dibayar harus >= total harga
-    if (cashPaid < totalPrice) {
+    if (cashPaidNumber < totalPrice) {
       toast.error(
         `Uang yang dibayarkan kurang! Minimal ${format.format(totalPrice)}`
       );
@@ -40,15 +44,34 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
     }
 
     // Jika validasi lolos, jalankan callback
-    onConfirm(cashPaid);
-  };
+    onConfirm(cashPaidNumber);
+  }, [cashPaidNumber, totalPrice, format, onConfirm]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!isLoading) {
-      setCashPaid(0);
+      setCashPaidInput("");
       onClose();
     }
-  };
+  }, [isLoading, onClose]);
+
+  const modalActions = useMemo(
+    () => [
+      {
+        label: "Batal",
+        onClick: handleClose,
+        variant: "secondary" as const,
+        disabled: isLoading,
+      },
+      {
+        label: isLoading ? "Memproses..." : "Konfirmasi Pembayaran",
+        onClick: handleConfirm,
+        variant: "primary" as const,
+        disabled: isLoading || cashPaidNumber === 0,
+        loading: isLoading,
+      },
+    ],
+    [handleClose, handleConfirm, isLoading, cashPaidNumber]
+  );
 
   return (
     <Modal
@@ -60,21 +83,7 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
       showCloseButton={!isLoading}
       closeOnOverlayClick={!isLoading}
       closeOnEscape={!isLoading}
-      actions={[
-        {
-          label: "Batal",
-          onClick: handleClose,
-          variant: "secondary",
-          disabled: isLoading,
-        },
-        {
-          label: isLoading ? "Memproses..." : "Konfirmasi Pembayaran",
-          onClick: handleConfirm,
-          variant: "primary",
-          disabled: isLoading || cashPaid === 0,
-          loading: isLoading,
-        },
-      ]}
+      actions={modalActions}
     >
       <div className="space-y-4">
         {/* Total yang harus dibayar (disabled) */}
@@ -95,13 +104,12 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
             Uang yang Dibayar
           </label>
           <Input
-            currency
             inputMode="decimal"
-            value={cashPaid || undefined}
-            onChange={(e) => setCashPaid(Number(e.target.value || 0))}
+            currency
+            value={cashPaidInput}
+            onChange={(e) => setCashPaidInput(e.target.value)}
             placeholder="Masukkan jumlah uang"
             disabled={isLoading}
-            autoFocus
           />
         </div>
 
@@ -110,24 +118,16 @@ export const CashPaymentModal: React.FC<CashPaymentModalProps> = ({
           <label className="text-sm font-medium text-slate-700 mb-1.5 block">
             Kembalian
           </label>
-          <div className="border rounded-lg px-3 py-2.5 bg-emerald-50 border-emerald-200">
-            <span
-              className={`font-semibold ${
-                change > 0 ? "text-emerald-700" : "text-slate-600"
-              }`}
-            >
-              {format.format(change)}
-            </span>
-          </div>
+          <Input disabled value={format.format(change)} />
         </div>
 
         {/* Warning jika uang kurang */}
-        {cashPaid > 0 && cashPaid < totalPrice && (
+        {cashPaidNumber > 0 && cashPaidNumber < totalPrice && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-700">
-              ⚠️ Uang yang dibayarkan kurang{" "}
+              Uang yang dibayarkan kurang{" "}
               <span className="font-semibold">
-                {format.format(totalPrice - cashPaid)}
+                {format.format(totalPrice - cashPaidNumber)}
               </span>
             </p>
           </div>
