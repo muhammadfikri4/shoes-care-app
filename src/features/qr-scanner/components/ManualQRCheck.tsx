@@ -1,5 +1,6 @@
 import React from "react";
 import { MdOutlineDocumentScanner } from "react-icons/md";
+import { CheckCircle, AlertTriangle } from "lucide-react";
 import { Button } from "../../_global/components/Button";
 import { Input } from "../../_global/components/Input";
 
@@ -8,6 +9,9 @@ interface ManualQRCheckProps {
   runLookup: VoidFunction;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   isLoading?: boolean;
+  successTransactionId?: string | null;
+  error?: string | null;
+  onViewDetails?: () => void;
 }
 
 export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
@@ -15,6 +19,9 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
   setInput,
   input,
   isLoading,
+  successTransactionId,
+  error,
+  onViewDetails,
 }) => {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -23,19 +30,7 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              {/* <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg> */}
+             
               <MdOutlineDocumentScanner className="text-3xl text-blue-800" />
             </div>
           </div>
@@ -70,6 +65,48 @@ export const ManualQRCheck: React.FC<ManualQRCheckProps> = ({
           >
             {isLoading ? "Mengecek..." : "Cek Transaksi"}
           </Button>
+
+          {/* Success Alert */}
+          {successTransactionId && (
+            <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-green-900 text-sm mb-1">
+                    Kode Transaksi Valid
+                  </h4>
+                  <p className="text-sm text-green-800 leading-relaxed">
+                    Untuk mengetahui informasi lengkap seperti status, waktu pemrosesan, serta
+                    detail pembayaran, silakan klik tombol berikut.{" "}
+                    <button
+                      onClick={onViewDetails}
+                      className="text-blue-600 hover:text-blue-700 font-medium underline"
+                    >
+                      Detail Transaksi
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Error Alert */}
+          {error && (
+            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-red-900 text-sm mb-1">
+                    Kode Transaksi Tidak Valid
+                  </h4>
+                  <p className="text-sm text-red-800 leading-relaxed">
+                    Maaf, kami tidak menemukan transaksi dengan kode tersebut. Periksa kembali
+                    ejaan kode transaksi Anda, atau pastikan transaksi sudah berhasil dibuat
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

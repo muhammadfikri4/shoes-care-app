@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp";
@@ -7,18 +7,20 @@ import { useLookupTransaction } from "../../transactions/hooks/useTransactions";
 import { HeaderQRCheck } from "../components/HeaderQRCheck";
 import { ManualQRCheck } from "../components/ManualQRCheck";
 import { InvalidQRResult } from "../components/InvalidQRResult";
+import { ValidTransactionResult } from "../components/ValidTransactionResult";
 import { useQrScanner } from "../hooks/useQrScanner";
 import { ApiResponse } from "../../../core/libs/api/types";
+import { MdOutlineDocumentScanner } from "react-icons/md";
 
 type Mode = "manual" | "scan";
 
 export const CheckQR: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [input, setInput] = useState<string>(
-    searchParams.get("invoice") || searchParams.get("qr") || ""
-  );
+  const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successTransactionId, setSuccessTransactionId] = useState<
+    string | null
+  >(null);
   const [mode, setMode] = useState<Mode>("manual");
   const mutation = useLookupTransaction();
   const navigate = useNavigate();
@@ -34,15 +36,15 @@ export const CheckQR: React.FC = () => {
       const res = await mutation.mutateAsync(
         isQr ? { qr: raw, code: "" } : { code: raw, qr: "" }
       );
-      navigate(`/my/transactions/${res?.data?.id}`);
-      setSearchParams(isQr ? { qr: raw } : { invoice: raw }, { replace: true });
+      // Show success alert instead of immediate redirect
+      setSuccessTransactionId(res?.data?.id || null);
     } catch (e: unknown) {
       const err = e as ApiResponse;
       const msg = err?.message || "Lookup gagal";
       setError(msg);
       // Redirect to customer login with returnUrl if unauthorized
       if (err?.status === 401 || err?.code === "UNAUTHORIZED") {
-        const returnUrl = `${window.location.pathname}${window.location.search}`;
+        const returnUrl = window.location.pathname;
         window.location.href = `/login?role=CUSTOMER&returnUrl=${encodeURIComponent(
           returnUrl
         )}`;
@@ -62,13 +64,20 @@ export const CheckQR: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const iv = searchParams.get("invoice");
-    const qr = searchParams.get("qr");
-    if (iv || qr) {
-      runLookup(iv || qr || undefined);
+  const handleViewDetails = () => {
+    if (successTransactionId) {
+      navigate(`/my/transactions/${successTransactionId}`);
     }
-  }, []);
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessTransactionId(null);
+    setInput("");
+    // Restart camera jika dalam mode scan
+    if (mode === "scan" && !active) {
+      start(currentCamId || undefined);
+    }
+  };
 
   const {
     videoRef,
@@ -109,6 +118,9 @@ export const CheckQR: React.FC = () => {
           setInput={setInput}
           input={input}
           isLoading={loading}
+          successTransactionId={successTransactionId}
+          error={error}
+          onViewDetails={handleViewDetails}
         />
       )}
 
@@ -118,6 +130,16 @@ export const CheckQR: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <div className="w-full sm:w-96">
               {" "}
+              <>
+                <div className="md:hidden flex justify-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <MdOutlineDocumentScanner className="text-3xl text-blue-800" />
+                  </div>
+                </div>
+                <p className="text-center text-slate-600 text-sm mb-8 leading-relaxed">
+                  Scan QR Code anda untuk melacak transaksi yang sedang berjalan
+                </p>
+              </>
               <DropdownRevamp
                 placeholder="Pilih kamera"
                 onChange={(e) => switchCamera(e.value)}
@@ -191,12 +213,23 @@ export const CheckQR: React.FC = () => {
         </div>
       )}
 
-      {/* Error Modal */}
-      <InvalidQRResult
-        show={!!error}
-        error={error || ""}
-        onRetry={clearError}
-      />
+      {/* Error Modal - Only show in scan mode */}
+      {mode === "scan" && (
+        <InvalidQRResult
+          show={!!error}
+          error={error || ""}
+          onRetry={clearError}
+        />
+      )}
+
+      {/* Success Modal - Only show in scan mode */}
+      {mode === "scan" && (
+        <ValidTransactionResult
+          show={!!successTransactionId}
+          onViewDetails={handleViewDetails}
+          onClose={handleCloseSuccess}
+        />
+      )}
     </BaseLayout>
   );
 };
