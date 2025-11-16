@@ -98,7 +98,7 @@ export const CheckQR: React.FC = () => {
 
   return (
     <BaseLayout
-      title="Check Transaksi"
+      title="Cek Transaksi"
       actionType="node"
       action={<HeaderQRCheck mode={mode} setMode={setMode} />}
     >
