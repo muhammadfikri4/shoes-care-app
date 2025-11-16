@@ -136,7 +136,7 @@ export const CheckQR: React.FC = () => {
                     <MdOutlineDocumentScanner className="text-3xl text-blue-800" />
                   </div>
                 </div>
-                <p className="text-center text-slate-600 text-sm mb-8 leading-relaxed">
+                <p className="md:hidden text-center text-slate-600 text-sm mb-8 leading-relaxed">
                   Scan QR Code anda untuk melacak transaksi yang sedang berjalan
                 </p>
               </>
