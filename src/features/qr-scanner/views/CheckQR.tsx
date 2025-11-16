@@ -146,13 +146,9 @@ export const CheckQR: React.FC = () => {
                 onClick={switchFacing}
                 title="Ganti kamera depan/belakang"
               >
-                {facing === "user" ? "Ke Belakang" : "Ke Depan"}
+                {facing === "user" ? "Kamera Depan" : "Kamera Belakang"}
               </Button>
             </div>
-
-            <span className="text-xs text-slate-500 ml-2">
-              Facing: <span className="font-medium">{facing}</span>
-            </span>
           </div>
 
           {camError && <div className="text-red-600 text-sm">{camError}</div>}

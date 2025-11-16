@@ -1,7 +1,7 @@
 // 📁 src/pages/Login.tsx
 import React, { useMemo, useState } from "react";
 import { BsShieldLock } from "react-icons/bs";
-import { HiOutlineMail, HiUserCircle } from "react-icons/hi";
+import { HiOutlineMail } from "react-icons/hi";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { TbShoe } from "react-icons/tb";
@@ -11,8 +11,8 @@ import { AuthLoginDTO } from "../../../core/model/auth";
 import { Button } from "../../_global/components/Button";
 import { Input } from "../../_global/components/Input";
 import { Poppins } from "../../_global/components/Text";
-import { useLogin } from "../hooks/useAuth";
 import { convertQueryParamsToObject } from "../../_global/helper";
+import { useLogin } from "../hooks/useAuth";
 
 type Role = "CUSTOMER" | "ADMIN";
 
@@ -30,7 +30,6 @@ export const LoginViews = () => {
   const queries = convertQueryParamsToObject(searchParams.toString());
   const setRole = (role: Role) => setSearchParams({ ...queries, role });
   const [show, setShow] = useState(false);
-  const [error, setError] = useState<string>("");
 
   const isValid = useMemo(() => {
     const okEmail = !!data.email && /\S+@\S+\.\S+/.test(data.email);
@@ -40,7 +39,6 @@ export const LoginViews = () => {
 
   const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    setError("");
 
     await mutateAsync({ ...data, role });
   };
@@ -74,9 +72,7 @@ export const LoginViews = () => {
             </div>
           </div>
 
-          <div className="text-sm text-white/85">
-            Tips: Gunakan email customer agar QR pengambilan terkirim otomatis.
-          </div>
+          <div></div>
         </div>
 
         {/* Right: Login Card */}
@@ -90,7 +86,7 @@ export const LoginViews = () => {
           </div>
 
           {/* Role Segmented Control */}
-          <div className="mb-6">
+          <div className="mb-4">
             <Poppins className="text-sm mb-2">Login sebagai</Poppins>
             <div
               role="tablist"
@@ -134,10 +130,6 @@ export const LoginViews = () => {
                 </span>
               </button>
             </div>
-            <p className="text-xs text-slate-500 mt-2">
-              Admin untuk input transaksi & manajemen rak. Pelanggan untuk lacak
-              & pengambilan.
-            </p>
           </div>
 
           {/* Form */}
@@ -186,9 +178,15 @@ export const LoginViews = () => {
               />
             </div>
 
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-md p-2">
-                {error}
+            {role === "CUSTOMER" && (
+              <div className="mt-6 text-sm text-slate-600">
+                Sudah pernah melakukan transaksi namun belum memiliki akun?{" "}
+                <Link
+                  to="/register-customer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Register
+                </Link>
               </div>
             )}
 
@@ -200,21 +198,8 @@ export const LoginViews = () => {
             </Button>
           </form>
 
-          {role === "CUSTOMER" && (
-            <div className="mt-6 text-sm text-slate-600">
-              Sudah pernah melakukan transaksi namun belum memiliki akun?{" "}
-              <Link
-                to="/register-customer"
-                className="text-blue-600 hover:underline"
-              >
-                Register
-              </Link>
-            </div>
-          )}
-
           <div className="mt-3 text-xs text-slate-500 flex items-center gap-1">
-            <HiUserCircle />
-            Pastikan email benar, agar notifikasi & QR pengambilan terkirim.
+            Catatan: Pastikan Email Valid Untuk Mempermudah Proses Transaksi
           </div>
         </div>
       </div>

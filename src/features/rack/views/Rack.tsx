@@ -176,11 +176,6 @@ export const RacksManagement: React.FC = () => {
       >
         <div className="px-4 pb-4">
           <h3 className="text-lg font-semibold mb-2">{titleDrawer}</h3>
-          <p className="text-sm text-slate-500 mb-4">
-            {drawerMode === "create"
-              ? "Masukkan data rak baru."
-              : "Perbarui data rak yang dipilih."}
-          </p>
 
           <RackForm
             form={form}
