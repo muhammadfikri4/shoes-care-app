@@ -180,7 +180,7 @@ export const TransactionCreate: React.FC = () => {
                 }}
                 list={[
                   { label: "QRIS", value: "QRIS" },
-                  { label: "Cash", value: "CASH" },
+                  { label: "Tunai", value: "CASH" },
                 ]}
                 onChange={(e) =>
                   setForm((p) => ({
