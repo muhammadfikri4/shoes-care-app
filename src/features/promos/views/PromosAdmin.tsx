@@ -1,4 +1,6 @@
+import { PromoModel } from "@core/model/promo";
 import { convertQueryParamsToObject } from "@features/_global/helper";
+import { formatTime } from "@features/_global/lib/format-time";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
@@ -9,7 +11,6 @@ import { MasterTable } from "../../_global/components/MasterTable";
 import { Pagination } from "../../_global/components/Pagination";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
-import { PromoModel } from "@core/model/promo";
 import { usePromoCheck, usePromosList } from "../hooks/usePromos";
 
 export const PromosAdmin: React.FC = () => {
@@ -56,8 +57,7 @@ export const PromosAdmin: React.FC = () => {
               "Pelanggan",
               "Diskon",
               "Status",
-              "Terpakai",
-              "Dibuat Pada",
+              "Di Terbitkan Pada",
             ]}
             columnTable={[
               {
@@ -76,21 +76,16 @@ export const PromosAdmin: React.FC = () => {
                 ),
               },
               {
-                return: ({ isActive }) => (
+                return: ({ isUsed }) => (
                   <Poppins className="text-sm">
-                    {isActive ? "Aktif" : "Tidak Aktif"}
+                    {isUsed ? "Terpakai" : "Belum Terpakai"}
                   </Poppins>
-                ),
-              },
-              {
-                return: ({ used }) => (
-                  <Poppins className="text-sm">{used ? "Ya" : "Tidak"}</Poppins>
                 ),
               },
               {
                 return: ({ createdAt }) => (
                   <Poppins className="text-sm">
-                    {new Date(createdAt).toLocaleString()}
+                    {formatTime(new Date(createdAt))}
                   </Poppins>
                 ),
               },
@@ -112,7 +107,7 @@ export const PromosAdmin: React.FC = () => {
                   </div>
                   <div className="text-sm">Diskon: {p.discountPercent}%</div>
                   <div className="text-xs text-slate-500">
-                    {new Date(p.createdAt).toLocaleString()}
+                    {formatTime(new Date(p.createdAt))}
                   </div>
                 </div>
               ))}

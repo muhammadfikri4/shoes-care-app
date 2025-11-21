@@ -4,7 +4,7 @@ export interface PromoModel {
   userId: string;
   discountPercent: number;
   isActive: boolean;
-  used: boolean;
+  isUsed: boolean;
   usedAt?: string | null;
   createdAt: string;
   user?: { id: string; email: string; name?: string | null };

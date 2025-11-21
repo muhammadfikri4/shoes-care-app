@@ -75,7 +75,6 @@ export const TransactionCreate: React.FC = () => {
       return;
     }
 
-    // Jika pakai promo, langsung submit tanpa modal (auto CASH)
     if (form.usePromo) {
       const formData = buildFormData({
         ...form,
