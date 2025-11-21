@@ -1,20 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  History,
-  LogOut,
-  Package,
-  QrCode,
-  ShoppingCart,
-  Menu,
-  X,
-} from "lucide-react";
-import { SidebarGroup } from "./SidebarGroup";
+import { RiDiscountPercentLine } from "react-icons/ri";
+
+import { LuFileCheck2 } from "react-icons/lu";
+import { PiMoneyWavy } from "react-icons/pi";
+
 import DSC from "@core/assets/logo/DSC.svg";
-import { Role } from "../../../../core/model/profile";
-import { useNavigate } from "react-router-dom";
 import { CONFIG_APP } from "@core/configs/app";
-import { IoTicketOutline } from "react-icons/io5";
-import { Dialog } from "../Dialog";
+import { History, LogOut, Menu, X } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { FiPackage } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { Role } from "../../../../core/model/profile";
+import { Modal } from "../Dialog/dialog-v2";
+import { SidebarGroup } from "./SidebarGroup";
+import { Poppins } from "../Text";
 
 export interface SidebarProps {
   role: Role;
@@ -32,19 +30,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isAdmin = role === "ADMIN";
   const navigate = useNavigate();
 
-  // === Mode controlled/uncontrolled
   const isControlled = typeof open === "boolean";
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const effectiveOpen = isControlled ? (open as boolean) : internalOpen;
 
-  // === State untuk logout modal
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // helper untuk ubah state dari dalam Sidebar
   const setOpen = useCallback(
-    (v: boolean) => {
-      if (!isControlled) setInternalOpen(v);
-      if (onOpenChange) onOpenChange(v);
+    (value: boolean) => {
+      if (!isControlled) setInternalOpen(value);
+      if (onOpenChange) onOpenChange(value);
     },
     [setInternalOpen, onOpenChange, isControlled]
   );
@@ -58,7 +53,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Kunci scroll body saat mobile & open
   useEffect(() => {
     if (!isMobile) return;
     document.body.style.overflow = effectiveOpen ? "hidden" : "";
@@ -67,7 +61,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     };
   }, [effectiveOpen, isMobile]);
 
-  // Tutup dengan ESC (mobile & desktop)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && effectiveOpen) setOpen(false);
@@ -83,20 +76,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {
               path: "/admin/transactions",
               label: "Transaksi",
-              icon: <ShoppingCart />,
+              icon: <PiMoneyWavy className="text-xl" />,
             },
-            { path: "/admin/racks", label: "Rak", icon: <Package /> },
-            { path: "/promos", label: "Promo", icon: <IoTicketOutline /> },
-            { path: "/check-qr", label: "QR Code Check", icon: <QrCode /> },
+            {
+              path: "/admin/racks",
+              label: "Rak",
+              icon: <FiPackage className="text-xl" />,
+            },
+            // { path: "/promos", label: "Promo", icon: <IoTicketOutline /> },
+            {
+              path: "/promos",
+              label: "Promo",
+              icon: <RiDiscountPercentLine className="text-xl" />,
+            },
+            {
+              path: "/check-qr",
+              label: "QR Code Check",
+              icon: <LuFileCheck2 className="text-xl" />,
+            },
           ]
-          : [
+        : [
             {
               path: "/my/transactions",
               label: "Riwayat Transaksi",
               icon: <History />,
             },
-            { path: "/promos", label: "Promo", icon: <IoTicketOutline /> },
-            { path: "/check-qr", label: "QR Code Check", icon: <QrCode /> },
+            {
+              path: "/promos",
+              label: "Promo",
+              icon: <RiDiscountPercentLine className="text-xl" />,
+            },
+            {
+              path: "/check-qr",
+              label: "QR Code Check",
+              icon: <LuFileCheck2 className="text-xl" />,
+            },
           ],
     [isAdmin]
   );
@@ -158,11 +172,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         role="complementary"
         aria-label="Sidebar"
       >
-        {/* HEADER */}
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <img src={DSC} className="w-10" />
-            {/* brand hanya tampak ketika expanded desktop / mobile open */}
             <span
               className={`font-bold text-lg ${
                 effectiveOpen ? "inline" : "hidden md:opacity-0"
@@ -205,44 +217,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </aside>
 
       {/* Logout Confirmation Modal */}
-      <Dialog show={showLogoutModal} onHide={() => setShowLogoutModal(false)}>
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-red-100 rounded-full p-3">
-              <LogOut className="text-red-600" size={24} />
-            </div>
+      <Modal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        title="Konfirmasi Logout"
+        variant="danger"
+        size="md"
+        actions={[
+          {
+            label: "Batal",
+            onClick: () => setShowLogoutModal(false),
+            variant: "secondary",
+          },
+          {
+            label: "Ya, Logout",
+            onClick: () => {
+              localStorage.removeItem(CONFIG_APP.TOKEN_KEY);
+              localStorage.removeItem(CONFIG_APP.REFRESH_TOKEN_KEY);
+              setShowLogoutModal(false);
+              navigate(isAdmin ? "/login" : "/login-customer", {
+                replace: true,
+              });
+            },
+            variant: "danger",
+          },
+        ]}
+      >
+        {/* <div className="mt-2">
+          <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700">
+            Pastikan rak tidak sedang dipakai sebelum menghapus.
           </div>
-
-          <h3 className="text-lg font-semibold text-center text-slate-900 mb-2">
-            Konfirmasi Logout
-          </h3>
-          <p className="text-sm text-center text-slate-600 mb-6">
-            Apakah Anda yakin ingin keluar dari akun ini?
-          </p>
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowLogoutModal(false)}
-              className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition"
-            >
-              Batal
-            </button>
-            <button
-              onClick={() => {
-                localStorage.removeItem(CONFIG_APP.TOKEN_KEY);
-                localStorage.removeItem(CONFIG_APP.REFRESH_TOKEN_KEY);
-                setShowLogoutModal(false);
-                navigate(isAdmin ? "/login" : "/login-customer", {
-                  replace: true,
-                });
-              }}
-              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
-            >
-              Ya, Logout
-            </button>
-          </div>
-        </div>
-      </Dialog>
+        </div> */}
+        <Poppins className="text-sm">Apakah Anda yakin ingin keluar dari akun ini?</Poppins>
+      </Modal>
     </>
   );
 };

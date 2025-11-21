@@ -98,7 +98,9 @@ export const MasterTable = <T extends DefaultKey>({
         </>
       </Table>
       <ConditionNode condition={!!pagination && pagination?.totalPages > 1}>
-        <Pagination {...(pagination as IPaginationProps)} />
+        <div className="px-4">
+          <Pagination {...(pagination as IPaginationProps)} />
+        </div>
       </ConditionNode>
     </div>
   );

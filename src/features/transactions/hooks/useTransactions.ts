@@ -6,7 +6,7 @@ import { BaseValue } from "../../_global/components/SmartFilter";
 import { useQueryParamsFilter } from "../../_global/hooks/useQueryParamsFilter";
 import useDebounce from "../../_global/hooks/useDebounce";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 interface TransactionQueryParams extends Omit<QueryParams, "search"> {
   status?: BaseValue;
@@ -18,8 +18,12 @@ interface TransactionQueryParams extends Omit<QueryParams, "search"> {
 }
 
 export const useTransactionsList = () => {
+  const [searchParams] = useSearchParams()
   const filter = useQueryParamsFilter<TransactionQueryParams>();
   const search = useDebounce(filter?.search?.value, 500);
+  const page = searchParams.get("page")
+  const perPage = searchParams.get("perPage")
+
   return useQuery({
     queryKey: [
       "transactions",
@@ -28,6 +32,8 @@ export const useTransactionsList = () => {
         status: filter?.status,
         startDate: filter?.startDate,
         endDate: filter?.endDate,
+        page,
+        perPage
       },
     ],
     queryFn: () =>
@@ -37,6 +43,8 @@ export const useTransactionsList = () => {
           ...(filter?.startDate && { startDate: filter?.startDate?.value }),
           ...(filter?.endDate && { endDate: filter?.endDate?.value }),
           ...(search && { search }),
+          ...page && { page },
+          ...perPage && { perPage },
         },
       }),
     refetchOnMount: "always",

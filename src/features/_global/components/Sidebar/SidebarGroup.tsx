@@ -19,10 +19,12 @@ export const SidebarGroup: React.FC<ItemMenu> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  console.log({ location });
   return (
     <button
-      onClick={() => { navigate(path); onSelect?.(); }}
+      onClick={() => {
+        navigate(path);
+        onSelect?.();
+      }}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
         location.pathname === path
           ? "bg-primary text-white"

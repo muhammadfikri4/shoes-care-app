@@ -187,7 +187,6 @@ export const RacksManagement: React.FC = () => {
         </div>
       </Drawer>
 
-      {/* Modal Delete */}
       <Modal
         isOpen={deleteOpen}
         onClose={closeDelete}

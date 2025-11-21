@@ -1,6 +1,6 @@
 import { TRANSACTION_STATUS, TransactionModel } from "@core/model/transaction";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { MasterTable } from "../../_global/components/MasterTable";
@@ -9,13 +9,15 @@ import { Poppins } from "../../_global/components/Text";
 import { formatTime } from "../../_global/lib/format-time";
 import { useTransactionsList } from "../hooks/useTransactions";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
+import { convertQueryParamsToObject } from "@features/_global/helper";
 
 export const TransactionsAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   const { data, isFetching } = useTransactionsList();
   const items: TransactionModel[] = (data?.data ?? []) as TransactionModel[];
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queries = convertQueryParamsToObject(searchParams?.toString());
   return (
     <BaseLayout
       title="Transaksi"
@@ -110,6 +112,12 @@ export const TransactionsAdmin: React.FC = () => {
         {/* Desktop table - tampil di layar besar */}
         <div className="hidden md:block">
           <MasterTable
+            pagination={{
+              currentPage: data?.meta?.page || 1,
+              totalPages: data?.meta?.totalPages || 1,
+              onPageChange: (page) =>
+                setSearchParams({ ...queries, page: page.toString() }),
+            }}
             isLoading={isFetching}
             rounded={{
               "bottom-left": false,
