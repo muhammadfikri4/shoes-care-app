@@ -58,9 +58,11 @@ export const transactionsService = {
   markCompleted: request.post<ApiResponse<OkResponse>, { id: string }>(
     `${API_ENDPOINT.pos.transactions}/complete`
   ),
+  updateItemStatus: request.put<
+    ApiResponse<OkResponse>
+  >(`${API_ENDPOINT.pos.transactions}/items/completed`),
 };
 
-// Promos
 export const promosService = {
   list: request.get<ApiResponse<PromoModel[]>>(API_ENDPOINT.pos.promos),
   check: request.get<ApiResponse<PromoCheckResponse>>(

@@ -8,6 +8,8 @@ export type TransactionStatus =
   | "CANCELLED";
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
 
+export type TransactionItemStatus = "INCOMING" | "IN_PROGRESS" | "COMPLETED";
+
 export enum TRANSACTION_STATUS {
   CREATED = "CREATED",
   IN_PROGRESS = "IN_PROGRESS",
@@ -16,11 +18,18 @@ export enum TRANSACTION_STATUS {
   CANCELLED = "CANCELLED",
 }
 
+export enum TRANSACTION_ITEM_STATUS {
+  INCOMING = "INCOMING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+}
+
 export interface TransactionItemModel {
   id: string;
   name: string;
   qty: number;
   price: number;
+  status?: TransactionItemStatus;
   estimateDay?: number | null;
   photoUrl?: string | null;
   note?: string | null;
@@ -35,6 +44,7 @@ export interface TransactionModel {
   price: number;
   finalPrice: number;
   promoApplied: boolean;
+  discount?: number;
   paymentMethod?: PaymentMethod;
   paymentStatus?: PaymentStatus;
   paidAt?: string | null;
@@ -91,6 +101,7 @@ export interface TransactionLookupModel {
   price: number;
   finalPrice: number;
   promoApplied: boolean;
+  discount?: number;
   qrCodeUrl?: string | null;
   customer: {
     name: string;

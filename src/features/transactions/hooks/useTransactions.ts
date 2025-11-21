@@ -187,3 +187,23 @@ export const usePortalTransaction = (id?: string) => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useUpdateItemStatus = () => {
+  const qc = useQueryClient();
+  const { transactionId } = useParams();
+  return useMutation({
+    mutationKey: ["transaction-item-status-update"],
+    mutationFn: (payload: {
+      itemId: string;
+    }) => transactionsService.updateItemStatus(undefined, {
+      path: payload.itemId
+    }),
+    onSuccess: async (res) => {
+      toast.success(res.message);
+      await qc.invalidateQueries({
+        queryKey: ["transaction-detail", { transactionId }],
+      });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+};
