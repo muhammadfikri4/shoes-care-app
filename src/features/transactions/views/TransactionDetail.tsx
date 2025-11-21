@@ -15,8 +15,11 @@ import {
   useMarkCompleted,
   useMarkReadyToPickup,
 } from "../hooks/useTransactions";
+import { useProfile } from "@features/profile/hooks/useProfile";
+import { ROLE } from "@core/model/profile";
 
 export const TransactionDetail: React.FC = () => {
+  const { data: profile } = useProfile();
   const { data: transaction, isFetching, error } = useDetailTransaction();
   const markReady = useMarkReadyToPickup();
   const markDone = useMarkCompleted();
@@ -54,13 +57,16 @@ export const TransactionDetail: React.FC = () => {
     return (
       <>
         <div className="w-screen h-screen flex flex-col items-center justify-center p-4 text-red-600">
-          <NotFound withBackButton width={"30rem"} gap={'1rem'} />
+          <NotFound withBackButton width={"30rem"} gap={"1rem"} />
         </div>
         ;
       </>
     );
 
   const items = transaction?.data?.items ?? [];
+  const isAdmin =
+    profile?.data?.role === ROLE.ADMIN ||
+    profile?.data?.role === ROLE.SUPERADMIN;
 
   return (
     <BaseLayout
@@ -78,23 +84,24 @@ export const TransactionDetail: React.FC = () => {
               </Button>
             </div>
           )}
-          {transaction?.data?.status === "IN_PROGRESS" && (
+          {transaction?.data?.status === "IN_PROGRESS" && isAdmin && (
             <div className="md:w-40 w-full">
               <Button variant="primary" onClick={() => setShowReadyModal(true)}>
                 Siap Diambil
               </Button>
             </div>
           )}
-          {transaction?.data?.status === TRANSACTION_STATUS.READY_TO_PICKUP && (
-            <div className="md:w-40 w-full">
-              <Button
-                variant="success"
-                onClick={() => setShowCompleteModal(true)}
-              >
-                Selesai
-              </Button>
-            </div>
-          )}
+          {transaction?.data?.status === TRANSACTION_STATUS.READY_TO_PICKUP &&
+            isAdmin && (
+              <div className="md:w-40 w-full">
+                <Button
+                  variant="success"
+                  onClick={() => setShowCompleteModal(true)}
+                >
+                  Selesai
+                </Button>
+              </div>
+            )}
         </div>
       }
     >
