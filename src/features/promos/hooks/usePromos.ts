@@ -3,10 +3,22 @@ import { promosService } from "@core/services/pos";
 import { ApiResponse } from "@core/libs/api/types";
 import { toast } from "react-toastify";
 
+import { useSearchParams } from "react-router-dom";
+
 export const usePromosList = () => {
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page");
+  const perPage = searchParams.get("perPage");
+
   return useQuery({
-    queryKey: ["promos"],
-    queryFn: () => promosService.list(),
+    queryKey: ["promos", { page, perPage }],
+    queryFn: () =>
+      promosService.list({
+        queryParams: {
+          ...(page && { page }),
+          ...(perPage && { perPage }),
+        },
+      }),
   });
 };
 

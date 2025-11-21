@@ -52,8 +52,12 @@ export const useTransactionsList = () => {
 };
 
 export const useMyTransactionsList = () => {
+  const [searchParams] = useSearchParams();
   const filter = useQueryParamsFilter<TransactionQueryParams>();
   const search = useDebounce(filter?.search?.value, 500);
+  const page = searchParams.get("page");
+  const perPage = searchParams.get("perPage");
+
   return useQuery({
     queryKey: [
       "transactions-mine",
@@ -62,6 +66,8 @@ export const useMyTransactionsList = () => {
         status: filter?.status,
         startDate: filter?.startDate,
         endDate: filter?.endDate,
+        page,
+        perPage,
       },
     ],
     queryFn: () =>
@@ -71,6 +77,8 @@ export const useMyTransactionsList = () => {
           ...(filter?.startDate && { startDate: filter?.startDate?.value }),
           ...(filter?.endDate && { endDate: filter?.endDate?.value }),
           ...(search && { search }),
+          ...(page && { page }),
+          ...(perPage && { perPage }),
         },
       }),
   });

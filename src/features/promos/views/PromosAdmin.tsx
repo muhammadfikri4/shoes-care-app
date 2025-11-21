@@ -1,20 +1,29 @@
+import { convertQueryParamsToObject } from "@features/_global/helper";
 import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
-import { MasterTable } from "../../_global/components/MasterTable";
-import { usePromoCheck, usePromosList } from "../hooks/usePromos";
-import { PromoModel } from "@core/model/promo";
-import { Poppins } from "../../_global/components/Text";
-import { CustomSection } from "../../_global/components/SmartFilter";
 import { Button } from "../../_global/components/Button";
 import { Modal } from "../../_global/components/Dialog/dialog-v2";
 import { InputLabel } from "../../_global/components/InputLabel";
+import { MasterTable } from "../../_global/components/MasterTable";
+import { Pagination } from "../../_global/components/Pagination";
+import { CustomSection } from "../../_global/components/SmartFilter";
+import { Poppins } from "../../_global/components/Text";
+import { PromoModel } from "@core/model/promo";
+import { usePromoCheck, usePromosList } from "../hooks/usePromos";
 
 export const PromosAdmin: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queries = convertQueryParamsToObject(searchParams?.toString());
   const { data, isFetching } = usePromosList();
   const items: PromoModel[] = (data?.data ?? []) as PromoModel[];
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const promoCheck = usePromoCheck();
+
+  const onPageChange = (page: number) => {
+    setSearchParams({ ...queries, page: page.toString() });
+  };
 
   return (
     <BaseLayout
@@ -30,6 +39,11 @@ export const PromosAdmin: React.FC = () => {
         <div className="hidden md:block">
           <MasterTable
             isLoading={isFetching}
+            pagination={{
+              currentPage: data?.meta?.page || 1,
+              totalPages: data?.meta?.totalPages || 1,
+              onPageChange: onPageChange,
+            }}
             rounded={{
               "bottom-left": false,
               "bottom-right": false,
@@ -86,21 +100,32 @@ export const PromosAdmin: React.FC = () => {
         </div>
         <div className="md:hidden space-y-3">
           {(items || [])?.length ? (
-            items.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
-              >
-                <div className="font-semibold">{p.code}</div>
-                <div className="text-sm text-slate-600">
-                  {p.user?.email || "-"}
+            <>
+              {items.map((p) => (
+                <div
+                  key={p.id}
+                  className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
+                >
+                  <div className="font-semibold">{p.code}</div>
+                  <div className="text-sm text-slate-600">
+                    {p.user?.email || "-"}
+                  </div>
+                  <div className="text-sm">Diskon: {p.discountPercent}%</div>
+                  <div className="text-xs text-slate-500">
+                    {new Date(p.createdAt).toLocaleString()}
+                  </div>
                 </div>
-                <div className="text-sm">Diskon: {p.discountPercent}%</div>
-                <div className="text-xs text-slate-500">
-                  {new Date(p.createdAt).toLocaleString()}
+              ))}
+              {data?.meta && (data.meta.totalPages || 1) > 1 && (
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={data.meta.page || 1}
+                    totalPages={data.meta.totalPages || 1}
+                    onPageChange={onPageChange}
+                  />
                 </div>
-              </div>
-            ))
+              )}
+            </>
           ) : (
             <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 flex-col flex justify-center items-center">
               Tidak ada data

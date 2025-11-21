@@ -1,8 +1,24 @@
 import { racksService } from "@core/services/pos";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useRacksList = () =>
-  useQuery({ queryKey: ["racks"], queryFn: () => racksService.list() });
+import { useSearchParams } from "react-router-dom";
+
+export const useRacksList = () => {
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page");
+  const perPage = searchParams.get("perPage");
+
+  return useQuery({
+    queryKey: ["racks", { page, perPage }],
+    queryFn: () =>
+      racksService.list({
+        queryParams: {
+          ...(page && { page }),
+          ...(perPage && { perPage }),
+        },
+      }),
+  });
+};
 
 export const useRackCreate = () =>
   useMutation({

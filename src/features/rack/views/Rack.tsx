@@ -1,12 +1,15 @@
+import { convertQueryParamsToObject } from "@features/_global/helper";
 import { RackModel } from "@core/model/rack";
 import { racksService } from "@core/services/pos";
 import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { Modal } from "../../_global/components/Dialog/dialog-v2";
 import { Drawer } from "../../_global/components/Drawer"; // sesuaikan path jika berbeda
 import { InputLabel } from "../../_global/components/InputLabel";
 import { MasterTable } from "../../_global/components/MasterTable";
+import { Pagination } from "../../_global/components/Pagination";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
 import { useRacksList } from "../hooks/useRacks";
@@ -20,6 +23,8 @@ type RackPayload = {
 type DrawerMode = "create" | "edit";
 
 export const RacksManagement: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queries = convertQueryParamsToObject(searchParams?.toString());
   const { data, refetch, isFetching } = useRacksList();
 
   // Drawer states
@@ -118,6 +123,10 @@ export const RacksManagement: React.FC = () => {
     }
   };
 
+  const onPageChange = (page: number) => {
+    setSearchParams({ ...queries, page: page.toString() });
+  };
+
   return (
     <BaseLayout
       title="Manajemen Rak"
@@ -127,45 +136,108 @@ export const RacksManagement: React.FC = () => {
       }}
     >
       <CustomSection>
-        <MasterTable
-          border={{ bottom: true, top: true, left: true, right: true }}
-          title={["Kode", "Nama", "Deskripsi", "Aksi"]}
-          isLoading={isFetching}
-          data={racks}
-          columnTable={[
-            {
-              return: (r: RackModel) => <Poppins>{r.code}</Poppins>,
-            },
-            {
-              return: (r: RackModel) => <Poppins>{r.name || "-"}</Poppins>,
-            },
-            {
-              return: (r: RackModel) => (
-                <Poppins>{r.description || "-"}</Poppins>
-              ),
-            },
-            {
-              return: (r: RackModel) => (
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => openEdit(r)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => askDelete(r)}
-                  >
-                    Hapus
-                  </Button>
+        {/* Mobile cards */}
+        <div className="block md:hidden space-y-3">
+          {racks.length > 0 ? (
+            <>
+              {racks.map((r) => (
+                <div
+                  key={r.id}
+                  className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-semibold">{r.code}</div>
+                      <div className="text-sm text-slate-600">
+                        {r.name || "-"}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => openEdit(r)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => askDelete(r)}
+                      >
+                        Hapus
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-500">
+                    {r.description || "-"}
+                  </div>
                 </div>
-              ),
-            },
-          ]}
-        />
+              ))}
+              {data?.meta && (data.meta.totalPages || 1) > 1 && (
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={data.meta.page || 1}
+                    totalPages={data.meta.totalPages || 1}
+                    onPageChange={onPageChange}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center text-sm text-slate-500 py-8 bg-white rounded-lg border border-slate-200">
+              Tidak ada rak.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block">
+          <MasterTable
+            border={{ bottom: true, top: true, left: true, right: true }}
+            title={["Kode", "Nama", "Deskripsi", "Aksi"]}
+            isLoading={isFetching}
+            pagination={{
+              currentPage: data?.meta?.page || 1,
+              totalPages: data?.meta?.totalPages || 1,
+              onPageChange: onPageChange,
+            }}
+            data={racks}
+            columnTable={[
+              {
+                return: (r: RackModel) => <Poppins>{r.code}</Poppins>,
+              },
+              {
+                return: (r: RackModel) => <Poppins>{r.name || "-"}</Poppins>,
+              },
+              {
+                return: (r: RackModel) => (
+                  <Poppins>{r.description || "-"}</Poppins>
+                ),
+              },
+              {
+                return: (r: RackModel) => (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => openEdit(r)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => askDelete(r)}
+                    >
+                      Hapus
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div>
       </CustomSection>
 
       {/* Drawer Create/Edit */}
