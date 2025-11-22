@@ -31,6 +31,7 @@ export const CheckQR: React.FC = () => {
     if (!raw) return;
     setLoading(true);
     setError(null);
+    setSuccessTransactionId(null);
     try {
       const isQr = raw.startsWith("qr-"); // contoh: qr-TRX-...
       const res = await mutation.mutateAsync(
@@ -97,6 +98,10 @@ export const CheckQR: React.FC = () => {
   });
 
   useEffect(() => {
+    setError(null);
+    setSuccessTransactionId(null);
+    setInput("");
+
     if (mode === "scan") {
       start();
     } else {

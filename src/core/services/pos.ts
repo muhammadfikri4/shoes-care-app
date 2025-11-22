@@ -22,8 +22,7 @@ export const racksService = {
       ApiResponse<RackModel>,
       { code?: string; name?: string; description?: string }
     >(`${API_ENDPOINT.pos.racks}/${id}`),
-  remove: (id: string) =>
-    request.delete<ApiResponse<OkResponse>>(`${API_ENDPOINT.pos.racks}/${id}`),
+  remove: request.delete<ApiResponse<OkResponse>>(`${API_ENDPOINT.pos.racks}`),
 };
 
 // Transactions

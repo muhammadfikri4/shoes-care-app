@@ -2,6 +2,7 @@ import { racksService } from "@core/services/pos";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const useRacksList = () => {
   const [searchParams] = useSearchParams();
@@ -23,8 +24,10 @@ export const useRacksList = () => {
 export const useRackCreate = () =>
   useMutation({
     mutationKey: ["rack-create"],
-    mutationFn: (body: { code: string; name?: string; location?: string }) =>
+    mutationFn: (body: { code: string; name?: string; description?: string }) =>
       racksService.create(body),
+    onSuccess: (res) => toast.success(res?.message),
+    onError: (err) => toast.error(err?.message),
   });
 
 export const useRackUpdate = () =>
@@ -37,12 +40,16 @@ export const useRackUpdate = () =>
       id: string;
       code?: string;
       name?: string;
-      location?: string;
+      description?: string;
     }) => racksService.update(id)(body),
+    onSuccess: (res) => toast.success(res?.message),
+    onError: (err) => toast.error(err?.message),
   });
 
 export const useRackRemove = () =>
   useMutation({
     mutationKey: ["rack-remove"],
-    mutationFn: (id: string) => racksService.remove(id)(),
+    mutationFn: (id: string) => racksService.remove({ path: id }),
+    onSuccess: (res) => toast.success(res?.message),
+    onError: (err) => toast.error(err?.message),
   });

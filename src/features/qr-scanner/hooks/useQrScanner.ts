@@ -1,6 +1,6 @@
-// src/hooks/useQrScanner.ts
 import { useEffect, useRef, useState, useCallback } from "react";
 import QrScanner from "qr-scanner";
+
 
 export type QrResultHandler = (text: string) => void;
 type Facing = "user" | "environment";
@@ -36,7 +36,6 @@ export function useQrScanner(onResult: QrResultHandler) {
       setError(null);
       if (!videoRef.current) return;
 
-      // dispose lama
       stop();
       scannerRef.current?.destroy();
       scannerRef.current = null;
@@ -52,9 +51,9 @@ export function useQrScanner(onResult: QrResultHandler) {
           }
         },
         {
-          onDecodeError: () => {},
+          onDecodeError: () => { },
           maxScansPerSecond: 8,
-          preferredCamera: deviceId ?? prefFacing, // QrScanner mendukung 'user' / 'environment'
+          preferredCamera: deviceId ?? prefFacing,
           highlightScanRegion: false,
           highlightCodeOutline: true,
         }
@@ -64,11 +63,8 @@ export function useQrScanner(onResult: QrResultHandler) {
       try {
         await scanner.start();
         setActive(true);
-
-        // daftar kamera
         const list = await listAndSetCameras();
 
-        // tentukan camId final
         let camId: string | null = deviceId ?? null;
         if (!camId) {
           const picked = pickCameraByFacing(list, prefFacing);
@@ -76,16 +72,15 @@ export function useQrScanner(onResult: QrResultHandler) {
         }
         if (camId) setCurrentCamId(camId);
 
-        // set facing berdasarkan label/id
         const label = list.find((c) => c.id === camId)?.label ?? "";
         const isFront = FRONT_REGEX.test(label);
         setFacing(isFront ? "user" : "environment");
 
-        // torch
         const has = await scanner.hasFlash();
         setHasTorch(has);
         setTorchOn(false);
       } catch (e) {
+        console.log({ e })
         const err = e as Error;
         setError(err?.message || "Tidak bisa mengakses kamera");
         stop();
@@ -120,13 +115,10 @@ export function useQrScanner(onResult: QrResultHandler) {
   function pickCameraByFacing(list: QrScanner.Camera[], want: Facing) {
     if (!list?.length) return null;
     const byRegex = want === "user" ? FRONT_REGEX : BACK_REGEX;
-    // 1) cari yang label match
     const exact = list.find((c) => byRegex.test(c.label || ""));
     if (exact) return exact;
-    // 2) fallback: id kadang mengandung petunjuk
     const byId = list.find((c) => byRegex.test(c.id || ""));
     if (byId) return byId;
-    // 3) fallback terakhir: pertama/terakhir
     return want === "user" ? list[0] : list[list.length - 1];
   }
 
@@ -144,7 +136,6 @@ export function useQrScanner(onResult: QrResultHandler) {
       setHasTorch(has);
       setTorchOn(false);
     } else {
-      // kalau belum aktif, start dengan facing yang diminta
       await start(picked.id, want);
     }
   }, [active, cameras, facing, start]);
@@ -172,7 +163,6 @@ export function useQrScanner(onResult: QrResultHandler) {
     };
   }, []);
 
-  // === Mirror preview bila front camera ===
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.style.transform =
@@ -191,8 +181,8 @@ export function useQrScanner(onResult: QrResultHandler) {
     torchOn,
     toggleTorch,
     switchCamera,
-    switchFacing, // <<— expose
-    facing, // <<— expose
+    switchFacing,
+    facing,
     error,
   };
 }

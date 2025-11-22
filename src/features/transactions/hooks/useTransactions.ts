@@ -127,6 +127,9 @@ export const useLookupTransaction = () => {
           }),
         },
       }),
+    onSuccess: () => {
+      // Optional: toast.success("Transaksi ditemukan");
+    },
   });
 };
 

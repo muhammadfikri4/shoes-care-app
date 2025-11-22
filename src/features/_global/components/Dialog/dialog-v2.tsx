@@ -7,7 +7,7 @@ import { Poppins } from "../Text";
 export interface ModalAction {
   label: string;
   onClick: () => void;
-  variant?: "primary" | "secondary" | "danger" | "success";
+  variant?: "primary" | "secondary" | "danger" | "success" | "disabled";
   disabled?: boolean;
   loading?: boolean;
 }
@@ -100,8 +100,7 @@ const HeaderIcon: React.FC<{ variant: NonNullable<ModalProps["variant"]> }> = ({
   return null;
 };
 
-// Loading spinner component
-const LoadingSpinner = () => (
+export const LoadingSpinner = () => (
   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/40 border-b-white"></div>
 );
 
