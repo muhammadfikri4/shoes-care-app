@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "../Button";
+import { Poppins } from "../Text";
 
 // Types
 export interface ModalAction {
@@ -316,8 +317,10 @@ export const Modal: React.FC<ModalProps> = ({
                     variant={action.variant}
                     disabled={action.disabled || action.loading}
                   >
-                    {action.loading && <LoadingSpinner />}
-                    {action.label}
+                    <div className="flex items-center gap-2">
+                      {action.loading && <LoadingSpinner />}
+                      <Poppins>{action.label}</Poppins>
+                    </div>
                   </Button>
                 </div>
               ))}
