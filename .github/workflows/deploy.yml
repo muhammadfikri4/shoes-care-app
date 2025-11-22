@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: shoes-care-api (shoes-care / production)
+    environment: shoes-care-app (shoes-care / production)
     env:
       SERVICE_NAME: "Shoes Care Frontend"
     steps:
