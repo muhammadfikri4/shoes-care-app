@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: shoes-care-app (shoes-care / production)
+    environment: shoes-care-api (shoes-care / production)
     env:
       SERVICE_NAME: "Shoes Care Frontend"
     steps:
@@ -44,16 +44,18 @@ jobs:
           embed-color: 16776960
           embed-url: ${{ github.event.head_commit.url }}
 
-      - name: Install Railway
+      - name: Install Railway CLI
         run: npm i -g @railway/cli
 
-      - name: Deploy
+      - name: Deploy to Railway
         run: |
+          echo "🚀 Starting deployment to Railway..."
           if [ -n "${{ secrets.RAILWAY_SERVICE_ID }}" ]; then
             railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
           else
             railway up
           fi
+          echo "✅ Deployment completed!"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
