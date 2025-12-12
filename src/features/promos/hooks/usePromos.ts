@@ -31,3 +31,10 @@ export const usePromoCheck = () => {
   });
 };
 
+export const usePromosSummary = () => {
+  return useQuery({
+    queryKey: ["promos-summary"],
+    queryFn: () => promosService.summarize(),
+  });
+};
+

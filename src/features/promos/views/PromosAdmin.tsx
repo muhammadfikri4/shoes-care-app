@@ -11,7 +11,9 @@ import { MasterTable } from "../../_global/components/MasterTable";
 import { Pagination } from "../../_global/components/Pagination";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
-import { usePromoCheck, usePromosList } from "../hooks/usePromos";
+import { usePromoCheck, usePromosList, usePromosSummary } from "../hooks/usePromos";
+import { PromoSummaryCard } from "../components/PromoSummaryCard";
+import { useProfile } from "../../profile/hooks/useProfile";
 
 export const PromosAdmin: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +23,8 @@ export const PromosAdmin: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const promoCheck = usePromoCheck();
+  const { data: summaryData, isFetching: isFetchingSummary } = usePromosSummary();
+  const { data: profile } = useProfile();
 
   const onPageChange = (page: number) => {
     setSearchParams({ ...queries, page: page.toString() });
@@ -36,6 +40,11 @@ export const PromosAdmin: React.FC = () => {
         </Button>
       }
     >
+      <PromoSummaryCard
+        summary={summaryData?.data}
+        role={profile?.data?.role}
+        isLoading={isFetchingSummary}
+      />
       <CustomSection>
         <div className="hidden md:block">
           <MasterTable

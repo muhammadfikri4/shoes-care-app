@@ -8,7 +8,7 @@ import {
   TransactionLookupModel,
   TransactionModel,
 } from "@core/model/transaction";
-import { PromoModel, PromoCheckResponse } from "@core/model/promo";
+import { PromoModel, PromoCheckResponse, PromoSummary } from "@core/model/promo";
 
 // Racks
 export const racksService = {
@@ -66,5 +66,8 @@ export const promosService = {
   list: request.get<ApiResponse<PromoModel[]>>(API_ENDPOINT.pos.promos),
   check: request.get<ApiResponse<PromoCheckResponse>>(
     `${API_ENDPOINT.pos.promos}/check`
+  ),
+  summarize: request.get<ApiResponse<PromoSummary>>(
+    `${API_ENDPOINT.pos.promos}/summarize`
   ),
 };

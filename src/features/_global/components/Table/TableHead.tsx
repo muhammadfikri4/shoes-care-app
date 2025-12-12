@@ -15,7 +15,7 @@ export const TableHead: React.FC<ITableHeadProps> = ({ field, className }) => {
         {field.map((item, index) => (
           <th
             key={index}
-            className="py-5 px-6 text-left text-sm font-bold tracking-wider uppercase hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200"
+            className="py-5 px-4 text-left text-sm font-bold tracking-wider uppercase hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200"
           >
             <Poppins className="text-sm">{item}</Poppins>
           </th>

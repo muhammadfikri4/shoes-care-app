@@ -16,3 +16,14 @@ export interface PromoCheckResponse {
   discountPercent: number;
 }
 
+export interface PromoSummary {
+  totalPromo?: number;                    // Admin: Total promos in system
+  totalCustomerWithPromo?: number;        // Admin: Total customers who have promos
+  totalPromoUsed?: number;                // Admin: Total promos used by all customers
+  totalPromoUnused?: number;              // Admin: Total promos unused by all customers
+  totalPromoOwned?: number;               // Customer: Total promos owned by this customer
+  customerTotalPromoUsed?: number;        // Customer: Total promos used by this customer
+  customerTotalPromoUnused?: number;      // Customer: Total promos unused by this customer
+  totalTransactionAfterPromo?: number;    // Customer: Eligibility count
+}
+
