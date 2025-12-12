@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: shoes-care-app (shoes-care / production)
     env:
-      SERVICE_NAME: "Shoes Care Frontend"
+      SERVICE_NAME: "SHOES CARE FRONTEND"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

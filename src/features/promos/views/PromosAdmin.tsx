@@ -11,7 +11,11 @@ import { MasterTable } from "../../_global/components/MasterTable";
 import { Pagination } from "../../_global/components/Pagination";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
-import { usePromoCheck, usePromosList, usePromosSummary } from "../hooks/usePromos";
+import {
+  usePromoCheck,
+  usePromosList,
+  usePromosSummary,
+} from "../hooks/usePromos";
 import { PromoSummaryCard } from "../components/PromoSummaryCard";
 import { useProfile } from "../../profile/hooks/useProfile";
 
@@ -23,7 +27,8 @@ export const PromosAdmin: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const promoCheck = usePromoCheck();
-  const { data: summaryData, isFetching: isFetchingSummary } = usePromosSummary();
+  const { data: summaryData, isFetching: isFetchingSummary } =
+    usePromosSummary();
   const { data: profile } = useProfile();
 
   const onPageChange = (page: number) => {
@@ -67,6 +72,7 @@ export const PromosAdmin: React.FC = () => {
               "Diskon",
               "Status",
               "Di Terbitkan Pada",
+              "Digunakan Pada",
             ]}
             columnTable={[
               {
@@ -98,6 +104,13 @@ export const PromosAdmin: React.FC = () => {
                   </Poppins>
                 ),
               },
+              {
+                return: ({ usedAt }) => (
+                  <Poppins className="text-sm">
+                    {usedAt ? formatTime(new Date(usedAt)) : "-"}
+                  </Poppins>
+                ),
+              },
             ]}
             notFoundMessage={["Tidak ada promo."]}
           />
@@ -116,7 +129,11 @@ export const PromosAdmin: React.FC = () => {
                   </div>
                   <div className="text-sm">Diskon: {p.discountPercent}%</div>
                   <div className="text-xs text-slate-500">
-                    {formatTime(new Date(p.createdAt))}
+                    Di Terbitkan Pada: {formatTime(new Date(p.createdAt))}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Digunakan Pada:{" "}
+                    {p.usedAt ? formatTime(new Date(p.usedAt)) : "-"}
                   </div>
                 </div>
               ))}
