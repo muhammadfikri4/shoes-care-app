@@ -437,6 +437,7 @@ export const TransactionCreate: React.FC = () => {
                       handleFileChange={(e) =>
                         updateItem(idx, { file: e?.[0] || null })
                       }
+                      supportFile={["jpg", "jpeg", "png", "webp"]}
                     />
                   </div>
                   <div className="md:col-span-2">
