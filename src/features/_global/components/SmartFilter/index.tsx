@@ -252,7 +252,7 @@ const Section: React.FC<CustomSectionProps> = memo(
                       <CustomDatePicker
                         range
                         value={{ start, end }}
-                        placeholder="Pilih rentang tanggal"
+                        placeholder="Pilih rentang waktu"
                         onChange={({ start, end }) => {
                           const s = start
                             ? formatDateToMMDDYYYY(start, "YYYY-MM-DD")
