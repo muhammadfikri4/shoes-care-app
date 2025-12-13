@@ -57,6 +57,11 @@ export interface TransactionModel {
   rack?: { id: string; code: string; name?: string | null } | null;
   items?: TransactionItemModel[];
   quantityShoes?: number;
+  customerUser?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export interface TransactionCreateItem {

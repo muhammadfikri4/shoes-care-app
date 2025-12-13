@@ -83,7 +83,10 @@ export const TransactionsAdmin: React.FC = () => {
                         {t.code}
                       </Poppins>
                       <div className="mt-1 text-xs text-slate-600">
-                        {t.customerName || t.customerEmail || "-"}
+                        <div>{t.customerName || "-"}</div>
+                        {t.customerUser?.email || t.customerEmail ? (
+                          <div>{t.customerUser?.email || t.customerEmail}</div>
+                        ) : null}
                       </div>
                     </div>
                     <TransactionStatusBadge status={t.status} />
@@ -148,8 +151,17 @@ export const TransactionsAdmin: React.FC = () => {
                 ),
               },
               {
-                return: ({ customerName }) => (
-                  <Poppins className="text-sm">{customerName}</Poppins>
+                return: ({ customerName, customerEmail, customerUser }) => (
+                  <div className="flex flex-col">
+                    <Poppins className="text-sm font-medium">
+                      {customerName || "-"}
+                    </Poppins>
+                    {customerUser?.email || customerEmail ? (
+                      <Poppins className="text-xs text-slate-500">
+                        {customerUser?.email || customerEmail}
+                      </Poppins>
+                    ) : null}
+                  </div>
                 ),
               },
               {
