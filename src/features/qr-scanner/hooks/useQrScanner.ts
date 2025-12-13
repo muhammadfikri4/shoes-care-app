@@ -81,7 +81,7 @@ export function useQrScanner(onResult: QrResultHandler) {
       } catch (e) {
         console.log({ e });
         const err = e as Error;
-        setError(err?.message || "Tidak bisa mengakses kamera");
+        setError(err?.message || "Tidak bisa mengakses kamera.");
         stop();
       }
     },
