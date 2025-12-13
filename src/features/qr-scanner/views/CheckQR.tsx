@@ -158,9 +158,9 @@ export const CheckQR: React.FC = () => {
             <div>
               {" "}
               <Button
-                onClick={() =>
-                  active ? stop() : start(currentCamId || undefined)
-                }
+                onClick={async () => {
+                  active ? stop() : start(currentCamId || undefined);
+                }}
                 variant="secondary"
               >
                 {active ? "Stop" : "Start"}
@@ -208,13 +208,6 @@ export const CheckQR: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {!!input && (
-            <div className="text-sm text-slate-600">
-              Hasil terakhir:{" "}
-              <span className="font-medium break-all">{input}</span>
-            </div>
-          )}
         </div>
       )}
 

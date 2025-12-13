@@ -17,6 +17,7 @@ export const API_ENDPOINT = {
   user: {
     base: `${CONFIG_APP.BASE_URL}/users`,
     profile: `${CONFIG_APP.BASE_URL}/users/profile/me`,
+    customers: `${CONFIG_APP.BASE_URL}/users/customers`,
   },
   pos: {
     racks: `${CONFIG_APP.BASE_URL}/racks`,

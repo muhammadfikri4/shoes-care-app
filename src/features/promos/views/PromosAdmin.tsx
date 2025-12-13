@@ -11,6 +11,7 @@ import { MasterTable } from "../../_global/components/MasterTable";
 import { Pagination } from "../../_global/components/Pagination";
 import { CustomSection } from "../../_global/components/SmartFilter";
 import { Poppins } from "../../_global/components/Text";
+import { Tabs } from "../../_global/components/Tabs";
 import {
   usePromoCheck,
   usePromosList,
@@ -18,10 +19,17 @@ import {
 } from "../hooks/usePromos";
 import { PromoSummaryCard } from "../components/PromoSummaryCard";
 import { useProfile } from "../../profile/hooks/useProfile";
+import { useCustomers } from "../../customers/hooks/useCustomers";
+import { CustomerTable } from "../../customers/components/CustomerTable";
+import { CustomerModel } from "@core/model/customer";
+import { ROLE } from "../../../core/model/profile";
 
 export const PromosAdmin: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queries = convertQueryParamsToObject(searchParams?.toString());
+  const [activeTab, setActiveTab] = useState("promos");
+
+  // Promos data
   const { data, isFetching } = usePromosList();
   const items: PromoModel[] = (data?.data ?? []) as PromoModel[];
   const [open, setOpen] = useState(false);
@@ -30,6 +38,12 @@ export const PromosAdmin: React.FC = () => {
   const { data: summaryData, isFetching: isFetchingSummary } =
     usePromosSummary();
   const { data: profile } = useProfile();
+
+  // Customers data
+  const { data: customersData, isFetching: isFetchingCustomers } =
+    useCustomers();
+  const customers: CustomerModel[] = (customersData?.data ??
+    []) as CustomerModel[];
 
   const onPageChange = (page: number) => {
     setSearchParams({ ...queries, page: page.toString() });
@@ -40,9 +54,11 @@ export const PromosAdmin: React.FC = () => {
       title="Promos"
       actionType="node"
       action={
-        <Button onClick={() => setOpen(true)} variant="secondary">
-          Cek Promo
-        </Button>
+        activeTab === "promos" ? (
+          <Button onClick={() => setOpen(true)} variant="secondary">
+            Cek Promo
+          </Button>
+        ) : null
       }
     >
       <PromoSummaryCard
@@ -50,110 +66,134 @@ export const PromosAdmin: React.FC = () => {
         role={profile?.data?.role}
         isLoading={isFetchingSummary}
       />
-      <CustomSection>
-        <div className="hidden md:block">
-          <MasterTable
-            isLoading={isFetching}
-            pagination={{
-              currentPage: data?.meta?.page || 1,
-              totalPages: data?.meta?.totalPages || 1,
-              onPageChange: onPageChange,
-            }}
-            rounded={{
-              "bottom-left": false,
-              "bottom-right": false,
-              "top-left": false,
-              "top-right": false,
-            }}
-            data={items || []}
-            title={[
-              "Kode",
-              "Pelanggan",
-              "Diskon",
-              "Status",
-              "Di Terbitkan Pada",
-              "Digunakan Pada",
-            ]}
-            columnTable={[
-              {
-                return: ({ code }) => (
-                  <Poppins className="text-sm">{code}</Poppins>
-                ),
-              },
-              {
-                return: ({ user }) => (
-                  <Poppins className="text-sm">{user?.email || "-"}</Poppins>
-                ),
-              },
-              {
-                return: ({ discountPercent }) => (
-                  <Poppins className="text-sm">{discountPercent}%</Poppins>
-                ),
-              },
-              {
-                return: ({ isUsed }) => (
-                  <Poppins className="text-sm">
-                    {isUsed ? "Terpakai" : "Belum Terpakai"}
-                  </Poppins>
-                ),
-              },
-              {
-                return: ({ createdAt }) => (
-                  <Poppins className="text-sm">
-                    {formatTime(new Date(createdAt))}
-                  </Poppins>
-                ),
-              },
-              {
-                return: ({ usedAt }) => (
-                  <Poppins className="text-sm">
-                    {usedAt ? formatTime(new Date(usedAt)) : "-"}
-                  </Poppins>
-                ),
-              },
-            ]}
-            notFoundMessage={["Tidak ada promo."]}
-          />
-        </div>
-        <div className="md:hidden space-y-3">
-          {(items || [])?.length ? (
-            <>
-              {items.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
-                >
-                  <div className="font-semibold">{p.code}</div>
-                  <div className="text-sm text-slate-600">
-                    {p.user?.email || "-"}
+
+      {profile?.data?.role === ROLE.ADMIN ||
+      profile?.data?.role === ROLE.SUPERADMIN ? (
+        <Tabs
+          tabs={[
+            { id: "promos", label: "Promo" },
+            { id: "customers", label: "Pelanggan" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      ) : null}
+      {activeTab === "promos" && (
+        <CustomSection>
+          <div className="hidden md:block">
+            <MasterTable
+              isLoading={isFetching}
+              pagination={{
+                currentPage: data?.meta?.page || 1,
+                totalPages: data?.meta?.totalPages || 1,
+                onPageChange: onPageChange,
+              }}
+              rounded={{
+                "bottom-left": false,
+                "bottom-right": false,
+                "top-left": false,
+                "top-right": false,
+              }}
+              data={items || []}
+              title={[
+                "Kode",
+                "Pelanggan",
+                "Diskon",
+                "Status",
+                "Di Terbitkan Pada",
+                "Digunakan Pada",
+              ]}
+              columnTable={[
+                {
+                  return: ({ code }) => (
+                    <Poppins className="text-sm">{code}</Poppins>
+                  ),
+                },
+                {
+                  return: ({ user }) => (
+                    <Poppins className="text-sm">{user?.email || "-"}</Poppins>
+                  ),
+                },
+                {
+                  return: ({ discountPercent }) => (
+                    <Poppins className="text-sm">{discountPercent}%</Poppins>
+                  ),
+                },
+                {
+                  return: ({ isUsed }) => (
+                    <Poppins className="text-sm">
+                      {isUsed ? "Terpakai" : "Belum Terpakai"}
+                    </Poppins>
+                  ),
+                },
+                {
+                  return: ({ createdAt }) => (
+                    <Poppins className="text-sm">
+                      {formatTime(new Date(createdAt))}
+                    </Poppins>
+                  ),
+                },
+                {
+                  return: ({ usedAt }) => (
+                    <Poppins className="text-sm">
+                      {usedAt ? formatTime(new Date(usedAt)) : "-"}
+                    </Poppins>
+                  ),
+                },
+              ]}
+              notFoundMessage={["Tidak ada promo."]}
+            />
+          </div>
+          <div className="md:hidden space-y-3">
+            {(items || [])?.length ? (
+              <>
+                {items.map((p) => (
+                  <div
+                    key={p.id}
+                    className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
+                  >
+                    <div className="font-semibold">{p.code}</div>
+                    <div className="text-sm text-slate-600">
+                      {p.user?.email || "-"}
+                    </div>
+                    <div className="text-sm">Diskon: {p.discountPercent}%</div>
+                    <div className="text-xs text-slate-500">
+                      Di Terbitkan Pada: {formatTime(new Date(p.createdAt))}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      Digunakan Pada:{" "}
+                      {p.usedAt ? formatTime(new Date(p.usedAt)) : "-"}
+                    </div>
                   </div>
-                  <div className="text-sm">Diskon: {p.discountPercent}%</div>
-                  <div className="text-xs text-slate-500">
-                    Di Terbitkan Pada: {formatTime(new Date(p.createdAt))}
+                ))}
+                {data?.meta && (data.meta.totalPages || 1) > 1 && (
+                  <div className="mt-4">
+                    <Pagination
+                      currentPage={data.meta.page || 1}
+                      totalPages={data.meta.totalPages || 1}
+                      onPageChange={onPageChange}
+                    />
                   </div>
-                  <div className="text-xs text-slate-500">
-                    Digunakan Pada:{" "}
-                    {p.usedAt ? formatTime(new Date(p.usedAt)) : "-"}
-                  </div>
-                </div>
-              ))}
-              {data?.meta && (data.meta.totalPages || 1) > 1 && (
-                <div className="mt-4">
-                  <Pagination
-                    currentPage={data.meta.page || 1}
-                    totalPages={data.meta.totalPages || 1}
-                    onPageChange={onPageChange}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 flex-col flex justify-center items-center">
-              Tidak ada data
-            </div>
-          )}
-        </div>
-      </CustomSection>
+                )}
+              </>
+            ) : (
+              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 flex-col flex justify-center items-center">
+                Tidak ada data
+              </div>
+            )}
+          </div>
+        </CustomSection>
+      )}
+
+      {activeTab === "customers" && (
+        <CustomerTable
+          customers={customers}
+          isLoading={isFetchingCustomers}
+          currentPage={customersData?.meta?.page || 1}
+          totalPages={customersData?.meta?.totalPages || 1}
+          onPageChange={onPageChange}
+        />
+      )}
       <Modal
         isOpen={open}
         showCloseButton={false}

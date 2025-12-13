@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import QrScanner from "qr-scanner";
 
-
 export type QrResultHandler = (text: string) => void;
 type Facing = "user" | "environment";
 
@@ -51,7 +50,7 @@ export function useQrScanner(onResult: QrResultHandler) {
           }
         },
         {
-          onDecodeError: () => { },
+          onDecodeError: () => {},
           maxScansPerSecond: 8,
           preferredCamera: deviceId ?? prefFacing,
           highlightScanRegion: false,
@@ -80,7 +79,7 @@ export function useQrScanner(onResult: QrResultHandler) {
         setHasTorch(has);
         setTorchOn(false);
       } catch (e) {
-        console.log({ e })
+        console.log({ e });
         const err = e as Error;
         setError(err?.message || "Tidak bisa mengakses kamera");
         stop();
@@ -156,6 +155,11 @@ export function useQrScanner(onResult: QrResultHandler) {
     }
   }, [torchOn]);
 
+  const requestCameraPermission = useCallback(async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    stream.getTracks().forEach((t) => t.stop());
+  }, []);
+
   useEffect(() => {
     return () => {
       scannerRef.current?.destroy();
@@ -184,5 +188,6 @@ export function useQrScanner(onResult: QrResultHandler) {
     switchFacing,
     facing,
     error,
+    requestCameraPermission,
   };
 }

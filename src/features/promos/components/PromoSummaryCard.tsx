@@ -2,6 +2,7 @@ import React from "react";
 import { PromoSummary } from "@core/model/promo";
 import { ROLE } from "@core/model/profile";
 import { Poppins } from "../../_global/components/Text";
+import { Skeleton } from "../../_global/components/Shimer";
 
 interface PromoSummaryCardProps {
   summary?: PromoSummary;
@@ -22,10 +23,12 @@ export const PromoSummaryCard: React.FC<PromoSummaryCardProps> = ({
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 animate-pulse"
+            className="bg-white rounded-lg border border-slate-200 shadow-sm p-4"
           >
-            <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-            <div className="h-8 bg-slate-200 rounded w-1/2"></div>
+            <div className="space-y-3">
+              <Skeleton width="75%" height="1rem" />
+              <Skeleton width="40%" height="2rem" />
+            </div>
           </div>
         ))}
       </div>
