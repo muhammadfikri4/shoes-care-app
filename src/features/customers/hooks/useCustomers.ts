@@ -18,3 +18,19 @@ export const useCustomers = () => {
       }),
   });
 };
+
+export const useCustomersList = (
+  search: string = "",
+  perPage: string = "5"
+) => {
+  return useQuery({
+    queryKey: ["customers-list", { search, perPage }],
+    queryFn: () =>
+      userService.getCustomers({
+        queryParams: {
+          search,
+          perPage,
+        },
+      }),
+  });
+};

@@ -10,6 +10,7 @@ import { Button } from "../../_global/components/Button";
 import { DropdownRevamp } from "../../_global/components/Dropdown/DropdownRevamp";
 import { InputFile } from "../../_global/components/File";
 import { Input } from "../../_global/components/Input";
+import { InputSuggestion } from "../../_global/components/InputSuggestion";
 import { Poppins } from "../../_global/components/Text";
 import { TextArea } from "../../_global/components/TextArea";
 import { SidebarAtom } from "../../_global/store";
@@ -18,6 +19,9 @@ import { CashPaymentModal } from "../components/CashPaymentModal";
 import { defaultValue } from "../const";
 import { usePromoVerify, useTransactionCreate } from "../hooks/useTransactions";
 import { buildFormData } from "../utils/build-form-data";
+import useDebounce from "../../_global/hooks/useDebounce";
+import { CustomerModel } from "../../../core/model/customer";
+import { useCustomersList } from "../../customers/hooks/useCustomers";
 
 export const TransactionCreate: React.FC = () => {
   const [form, setForm] = useState<TransactionCreationDTO>(defaultValue);
@@ -26,6 +30,34 @@ export const TransactionCreate: React.FC = () => {
   const promoVerify = usePromoVerify();
   const { data: racksData } = useRacksList();
   const [sidebar] = useAtom(SidebarAtom);
+
+  const [customerSearch, setCustomerSearch] = useState("");
+  const debouncedSearch = useDebounce(customerSearch, 300);
+
+  const { data: customersData } = useCustomersList(debouncedSearch);
+
+  const customerNameOptions = useMemo(() => {
+    return (customersData?.data ?? []).map((c) => ({
+      label: `${c.name} - ${c.email}`,
+      value: c,
+    }));
+  }, [customersData]);
+
+  const customerEmailOptions = useMemo(() => {
+    return (customersData?.data ?? []).map((c) => ({
+      label: c.email,
+      value: c,
+    }));
+  }, [customersData]);
+
+  const handleCustomerSelect = (customer: CustomerModel) => {
+    setForm((prev) => ({
+      ...prev,
+      customerName: customer.name,
+      customerEmail: customer.email,
+    }));
+  };
+
   const format = useMemo(
     () =>
       new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }),
@@ -132,11 +164,22 @@ export const TransactionCreate: React.FC = () => {
               <div className="text-sm text-slate-600 mb-1">
                 Nama Pelanggan <span className="text-red-500">(Wajib)</span>
               </div>
-              <Input
+              <InputSuggestion<CustomerModel>
                 value={form.customerName}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, customerName: e.target.value }))
-                }
+                onChangeText={(text) => {
+                  setForm((p) => ({ ...p, customerName: text }));
+                  setCustomerSearch(text);
+                }}
+                onSelect={(opt) => {
+                  handleCustomerSelect({
+                    ...opt.value,
+                    name: opt?.value?.name || opt?.label,
+                    ...(opt?.value?.email && {
+                      email: opt.value?.email,
+                    }),
+                  });
+                }}
+                list={customerNameOptions}
                 placeholder="Nama Pelanggan"
               />
             </div>
@@ -144,12 +187,22 @@ export const TransactionCreate: React.FC = () => {
               <div className="text-sm text-slate-600 mb-1">
                 Email Pelanggan <span className="text-red-500">(Wajib)</span>
               </div>
-              <Input
-                type="email"
+              <InputSuggestion<CustomerModel>
                 value={form.customerEmail}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, customerEmail: e.target.value }))
-                }
+                onChangeText={(text) => {
+                  setForm((p) => ({ ...p, customerEmail: text }));
+                  setCustomerSearch(text);
+                }}
+                onSelect={(opt) => {
+                  handleCustomerSelect({
+                    ...opt.value,
+                    email: opt?.value?.email || opt?.label,
+                    ...(opt?.value?.name && {
+                      name: opt.value?.name,
+                    }),
+                  });
+                }}
+                list={customerEmailOptions}
                 placeholder="Email Pelanggan"
               />
             </div>
