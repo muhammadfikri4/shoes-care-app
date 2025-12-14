@@ -1,6 +1,7 @@
 import DSC from "@core/assets/logo/DSC.svg";
 import { ROLE } from "@core/model/profile";
 import { useProfile } from "@features/profile/hooks/useProfile";
+import { differenceInDays } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   TRANSACTION_ITEM_STATUS,
@@ -141,9 +142,32 @@ export const TransactionDetail: React.FC = () => {
             <InfoItem
               label="Tanggal Transaksi"
               value={
-                transaction?.data?.createdAt
-                  ? formatTime(transaction?.data?.createdAt)
-                  : "-"
+                transaction?.data?.createdAt ? (
+                  <>
+                    {formatTime(transaction?.data?.createdAt)}
+                    {(() => {
+                      if (
+                        transaction?.data?.status ===
+                        TRANSACTION_STATUS.READY_TO_PICKUP
+                      ) {
+                        const readyDate = transaction?.data?.readyAt
+                          ? new Date(transaction.data.readyAt)
+                          : new Date(transaction.data.createdAt);
+                        const diff = differenceInDays(new Date(), readyDate);
+                        if (diff > 0) {
+                          return (
+                            <span className="text-red-500 ml-1">
+                              ({diff} hari belum diambil)
+                            </span>
+                          );
+                        }
+                      }
+                      return null;
+                    })()}
+                  </>
+                ) : (
+                  "-"
+                )
               }
             />
             <InfoItem

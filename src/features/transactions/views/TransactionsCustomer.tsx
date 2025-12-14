@@ -1,6 +1,7 @@
 import { convertQueryParamsToObject } from "@features/_global/helper";
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { differenceInDays } from "date-fns";
 import { BaseLayout } from "../../_global/components/BaseLayout";
 import { Button } from "../../_global/components/Button";
 import { MasterTable } from "../../_global/components/MasterTable";
@@ -11,6 +12,15 @@ import { formatTime } from "../../_global/lib/format-time";
 import { TransactionStatusBadge } from "../components/TransactionStatusBadge";
 import { useMyTransactionsList } from "../hooks/useTransactions";
 import { TRANSACTION_STATUS, TransactionModel } from "@core/model/transaction";
+
+const getDaysNotPickedUp = (transaction: TransactionModel): number | null => {
+  if (transaction.status !== TRANSACTION_STATUS.READY_TO_PICKUP) {
+    return null;
+  }
+  const readyDate = transaction.readyAt ? new Date(transaction.readyAt) : new Date(transaction.createdAt);
+  const diff = differenceInDays(new Date(), readyDate);
+  return diff > 0 ? diff : null;
+};
 
 export const TransactionsCustomer: React.FC = () => {
   const navigate = useNavigate();
@@ -74,7 +84,15 @@ export const TransactionsCustomer: React.FC = () => {
                   </div>
 
                   <div className="text-xs text-slate-500 mb-3">
-                    {formatTime(new Date(t.createdAt), false)}
+                    {formatTime(new Date(t.createdAt), true)}
+                    {(() => {
+                      const daysNotPickedUp = getDaysNotPickedUp(t);
+                      return daysNotPickedUp ? (
+                        <span className="text-red-500 ml-1">
+                          ({daysNotPickedUp} hari belum diambil)
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
 
                   <div className="flex justify-end">
@@ -129,11 +147,19 @@ export const TransactionsCustomer: React.FC = () => {
                 ),
               },
               {
-                return: ({ createdAt }) => (
-                  <Poppins className="text-sm">
-                    {formatTime(new Date(createdAt), false)}
-                  </Poppins>
-                ),
+                return: (t) => {
+                  const daysNotPickedUp = getDaysNotPickedUp(t);
+                  return (
+                    <Poppins className="text-sm">
+                      {formatTime(new Date(t.createdAt), true)}
+                      {daysNotPickedUp ? (
+                        <span className="text-red-500 ml-1">
+                          ({daysNotPickedUp} hari belum diambil)
+                        </span>
+                      ) : null}
+                    </Poppins>
+                  );
+                },
               },
               {
                 return: ({ status }) => (

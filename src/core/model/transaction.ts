@@ -41,6 +41,7 @@ export interface TransactionModel {
   code: string;
   status: TransactionStatus;
   createdAt: string;
+  readyAt?: string | null;
   price: number;
   finalPrice: number;
   promoApplied: boolean;
@@ -108,6 +109,7 @@ export interface TransactionLookupModel {
   promoApplied: boolean;
   discount?: number;
   qrCodeUrl?: string | null;
+  readyAt?: string | null;
   customer: {
     name: string;
     phone: string;
