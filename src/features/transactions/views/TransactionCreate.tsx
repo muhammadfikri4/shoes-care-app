@@ -80,6 +80,7 @@ export const TransactionCreate: React.FC = () => {
           estimateDay: 0,
           file: undefined,
           note: undefined,
+          size: undefined,
         },
       ],
     }));
@@ -363,94 +364,123 @@ export const TransactionCreate: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div className="grid md:grid-cols-4 grid-cols-1 gap-3">
-                  <div>
-                    <Poppins className="text-sm text-slate-600 mb-1">
-                      Nomor Rak
-                    </Poppins>
-                    <DropdownRevamp
-                      placeholder="Pilih Rak"
-                      defaultValue={
-                        it.rack?.id
-                          ? { label: it.rack?.name || "", value: it.rack?.id }
-                          : undefined
-                      }
-                      list={(racksData?.data ?? []).map((r) => ({
-                        label: `${r.code}${r.name ? " - " + r.name : ""}`,
-                        value: r.id,
-                      }))}
-                      onChange={(e) =>
-                        updateItem(idx, {
-                          rack: { id: e.value, name: e.label },
-                        })
-                      }
-                    />
+                <div className="space-y-4">
+                  {/* Baris 1: Nomor Rak & Nama Sepatu */}
+                  <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Nomor Rak <span className="text-red-500">*</span>
+                      </Poppins>
+                      <DropdownRevamp
+                        placeholder="Pilih Rak"
+                        defaultValue={
+                          it.rack?.id
+                            ? { label: it.rack?.name || "", value: it.rack?.id }
+                            : undefined
+                        }
+                        list={(racksData?.data ?? []).map((r) => ({
+                          label: `${r.code}${r.name ? " - " + r.name : ""}`,
+                          value: r.id,
+                        }))}
+                        onChange={(e) =>
+                          updateItem(idx, {
+                            rack: { id: e.value, name: e.label },
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Nama Sepatu
+                      </Poppins>
+                      <Input
+                        className="border p-2 rounded w-full"
+                        value={it.name}
+                        onChange={(e) =>
+                          updateItem(idx, { name: e.target.value })
+                        }
+                        placeholder="Contoh: Nike Air Max"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Poppins className="text-sm text-slate-600 mb-1">
-                      Nama Sepatu
-                    </Poppins>
-                    <Input
-                      className="border p-2 rounded w-full"
-                      value={it.name}
-                      onChange={(e) =>
-                        updateItem(idx, { name: e.target.value })
-                      }
-                      placeholder="Contoh: Nike Air"
-                    />
-                  </div>
-                  <div>
-                    <Poppins className="text-sm text-slate-600 mb-1">
-                      Harga (Rp)
-                    </Poppins>
-                    <Input
-                      currency
-                      onChange={(e) =>
-                        updateItem(idx, { price: Number(e.target.value) })
-                      }
-                      placeholder="Rp 0"
-                    />
-                  </div>
-                  <div>
-                    <Poppins className="text-sm text-slate-600 mb-1">
-                      Estimasi (Hari)
-                    </Poppins>
-                    <Input
-                      inputMode="decimal"
-                      type="number"
-                      value={it.estimateDay || undefined}
-                      onChange={(e) =>
-                        updateItem(idx, { estimateDay: Number(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Poppins className="text-sm text-slate-600 mb-1">
-                      Unggah Foto
-                    </Poppins>
 
-                    <InputFile
-                      selectedFile={it.file ? [it.file] : []}
-                      resetDefaultImage={() =>
-                        updateItem(idx, { file: undefined })
-                      }
-                      handleFileChange={(e) =>
-                        updateItem(idx, { file: e?.[0] || null })
-                      }
-                      supportFile={["jpg", "jpeg", "png", "webp"]}
-                    />
+                  {/* Baris 2: Ukuran, Harga & Estimasi */}
+                  <div className="grid md:grid-cols-3 grid-cols-1 gap-3">
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Ukuran
+                      </Poppins>
+                      <Input
+                        className="border p-2 rounded w-full"
+                        value={it.size || ""}
+                        onChange={(e) =>
+                          updateItem(idx, { size: e.target.value })
+                        }
+                        placeholder="Contoh: 42"
+                      />
+                    </div>
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Harga (Rp)
+                      </Poppins>
+                      <Input
+                        currency
+                        onChange={(e) =>
+                          updateItem(idx, { price: Number(e.target.value) })
+                        }
+                        placeholder="Rp 0"
+                      />
+                    </div>
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Estimasi (Hari)
+                      </Poppins>
+                      <Input
+                        inputMode="decimal"
+                        type="number"
+                        value={it.estimateDay || undefined}
+                        onChange={(e) =>
+                          updateItem(idx, {
+                            estimateDay: Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
-                  <div className="md:col-span-2">
-                    <div className="text-sm text-slate-600 mb-1">Catatan</div>
-                    <TextArea
-                      onChange={(e) =>
-                        updateItem(idx, { note: e.target.value })
-                      }
-                      style={{ resize: "none" }}
-                      placeholder="Catatan tambahan"
-                    >
-                      {it.note}
-                    </TextArea>
+
+                  {/* Baris 3: Foto & Catatan */}
+                  <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Unggah Foto
+                      </Poppins>
+                      <InputFile
+                        selectedFile={it.file ? [it.file] : []}
+                        resetDefaultImage={() =>
+                          updateItem(idx, { file: undefined })
+                        }
+                        handleFileChange={(e) =>
+                          updateItem(idx, { file: e?.[0] || null })
+                        }
+                        supportFile={["jpg", "jpeg", "png", "webp"]}
+                      />
+                    </div>
+                    <div>
+                      <Poppins className="text-sm text-slate-600 mb-1">
+                        Catatan
+                      </Poppins>
+                      <TextArea
+                        onChange={(e) =>
+                          updateItem(idx, { note: e.target.value })
+                        }
+                        style={{ resize: "none" }}
+                        placeholder="Catatan tambahan (opsional)"
+                        height={50}
+                      >
+                        {it.note}
+                      </TextArea>
+                    </div>
                   </div>
                 </div>
               </div>

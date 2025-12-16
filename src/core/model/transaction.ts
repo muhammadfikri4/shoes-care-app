@@ -34,6 +34,7 @@ export interface TransactionItemModel {
   photoUrl?: string | null;
   note?: string | null;
   rackCode?: string | null;
+  size?: string | null;
 }
 
 export interface TransactionModel {
@@ -72,6 +73,7 @@ export interface TransactionCreateItem {
   days?: number;
   photoUrl?: string;
   note?: string;
+  size?: string;
 }
 
 export interface TransactionCreateRequest {
@@ -141,6 +143,7 @@ export interface TransactionItem {
   estimateDay: number;
   file?: File;
   note?: string;
+  size?: string;
 }
 
 export interface TransactionCreationDTO {

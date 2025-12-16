@@ -94,6 +94,7 @@ export const TransactionPortal: React.FC = () => {
                   price={it.price}
                   estimateDay={it.estimateDay}
                   imgSrc={it.photoUrl}
+                  size={it.size}
                   currencyFormatter={format}
                   onClickImage={() => setShowImageIndex(idx)}
                 />
@@ -119,6 +120,7 @@ type ItemCardProps = {
   price?: number;
   estimateDay?: number | null;
   imgSrc?: string | null;
+  size?: string | null;
   currencyFormatter: Intl.NumberFormat;
   onClickImage?: () => void;
 };
@@ -128,6 +130,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   rackCode,
   price,
   imgSrc,
+  size,
   currencyFormatter,
   estimateDay,
   onClickImage,
@@ -156,6 +159,11 @@ const ItemCard: React.FC<ItemCardProps> = ({
           <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
             Nomor Rak: <span className="font-medium">{rackCode || "-"}</span>
           </div>
+          {size && (
+            <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Ukuran: <span className="font-medium">{size}</span>
+            </div>
+          )}
           <div className="mt-2 text-sm">
             Harga: <span className="font-semibold">{currencyFormatter.format(Number(price || 0))}</span>
           </div>

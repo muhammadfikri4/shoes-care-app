@@ -239,6 +239,7 @@ export const TransactionDetail: React.FC = () => {
                   price={it.price}
                   imgSrc={it.photoUrl}
                   status={it.status}
+                  size={it.size}
                   currencyFormatter={format}
                   transactionId={transaction?.data?.id}
                   transactionStatus={transaction?.data?.status}
@@ -328,6 +329,7 @@ type ItemCardProps = {
   estimateDay?: number | null;
   imgSrc?: string | null;
   status?: string;
+  size?: string | null;
   currencyFormatter: Intl.NumberFormat;
   transactionId?: string;
   transactionStatus?: string;
@@ -343,6 +345,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   price,
   imgSrc,
   status,
+  size,
   currencyFormatter,
   estimateDay,
   transactionStatus,
@@ -383,6 +386,11 @@ const ItemCard: React.FC<ItemCardProps> = ({
             <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
               Nomor Rak: <span className="font-medium">{rackCode || "-"}</span>
             </div>
+            {size && (
+              <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Ukuran: <span className="font-medium">{size}</span>
+              </div>
+            )}
 
             <div className="mt-2 text-sm">
               Harga:{" "}

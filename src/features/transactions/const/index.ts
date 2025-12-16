@@ -16,6 +16,7 @@ export const defaultValue: TransactionCreationDTO = {
       estimateDay: 0,
       file: undefined,
       note: undefined,
+      size: undefined,
     },
   ],
 };
